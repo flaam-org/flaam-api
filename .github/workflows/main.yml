@@ -17,8 +17,8 @@ jobs:
         id: commit_info
         run: |
           echo $GITHUB_CONTEXT
-          echo ::set-output name=commit_count::$(git rev-list --count ${{ github.event.before }}..${{ github.event.after }})
-          FILES_CHANGED="$(git diff-tree --no-commit-id --name-status --diff-filter=ADMR -r ${{ github.event.before }} ${{ github.event.after }})"
+          echo ::set-output name=commit_count::$(git rev-list --count ${{ github.event.before }}..${{ github.event.after }} || echo null)
+          FILES_CHANGED="$(git diff-tree --no-commit-id --name-status --diff-filter=ADMR -r ${{ github.event.before }} ${{ github.event.after }} || echo null)"
           FILES_CHANGED="${FILES_CHANGED//$'A\t'/[A]~ }"
           FILES_CHANGED="${FILES_CHANGED//$'D\t'/[D]~ }"
           FILES_CHANGED="${FILES_CHANGED//$'M\t'/[M]~ }"
