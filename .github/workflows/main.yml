@@ -32,6 +32,7 @@ jobs:
         run: |
           curl \
           -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d disable_notification=true \
           -d parse_mode=HTML \
           -d text=\
           "↗️ <b>PUSH</b>%0A\
