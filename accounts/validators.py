@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 @deconstructible
-class UnicodeUsernameValidator(validators.RegexValidator):
+class UsernameValidator(validators.RegexValidator):
     regex = r"^(?=.{4,32}$)(?![_])(?!.*[_]{2})[a-zA-Z0-9_]+(?<![_])$"
     message = _(
         "Username must be 4 to 32 characters long. "

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from .validators import UnicodeUsernameValidator
+from .validators import UsernameValidator
 
 
 def avatar_path(instance, filename):
@@ -18,9 +18,9 @@ class User(AbstractUser):
             "It shouldn't start or end with underscores.\n"
             "It shouldn't contain consecutive underscores"
         ),
-        max_length=150,
+        max_length=32,
         unique=True,
-        validators=(UnicodeUsernameValidator,),
+        validators=(UsernameValidator,),
         verbose_name="username",
     )
     email = models.EmailField(
