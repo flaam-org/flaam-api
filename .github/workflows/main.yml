@@ -1,0 +1,48 @@
+name: Main CI
+
+on:
+  push:
+
+jobs:
+  build:
+    name: Notify
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v2
+        with: 
+          fetch-depth: 0
+
+      - name: Get commit details
+        id: commit_info
+        run: |
+          echo $GITHUB_CONTEXT
+          echo ::set-output name=commit_count::$(git rev-list --count ${{ github.event.before }}..${{ github.event.after }})
+          FILES_CHANGED="$(git diff-tree --no-commit-id --name-status --diff-filter=ADMR -r ${{ github.event.before }} ${{ github.event.after }})"
+          FILES_CHANGED="${FILES_CHANGED//$'A\t'/[A]~ }"
+          FILES_CHANGED="${FILES_CHANGED//$'D\t'/[D]~ }"
+          FILES_CHANGED="${FILES_CHANGED//$'M\t'/[M]~ }"
+          FILES_CHANGED="${FILES_CHANGED//$'R\t'/[R]~ }"
+          FILES_CHANGED="${FILES_CHANGED//'%'/'%25'}"
+          FILES_CHANGED="${FILES_CHANGED//$'\n'/'%0A'}"
+          FILES_CHANGED="${FILES_CHANGED//$'\r'/'%0D'}"
+          echo ::set-output name=files_changed::$FILES_CHANGED
+
+      - name: Send a message about the latest commit
+        run: |
+          curl \
+          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+          -d parse_mode=HTML \
+          -d text=\
+          "↗️ <b>PUSH</b>%0A\
+          <b>was made at:</b> ${{ github.repository }}%0A\
+          <b>by:</b> <u>${{ github.actor }}</u>%0A\
+          <b>commits pushed:</b> ${{ steps.commit_info.outputs.commit_count }}%0A\
+          <b>commit message:</b>%0A\
+          ${{ github.event.head_commit.message }}%0A\
+          %0A\
+          <b>files changed:</b>%0A\
+          <pre>${{  steps.commit_info.outputs.files_changed }}</pre>%0A\
+          %0A\
+          <b>url:</b> https://github.com/${{ github.repository }}/commit/${{ github.sha }}" \
+          https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
