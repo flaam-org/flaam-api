@@ -26,10 +26,8 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
-
 admin.site.site_header = "Flaam"
 admin.site.site_title = "Flaam"
-admin.site.index_title = "Admin"
 
 schema_view = get_schema_view(
     openapi.Info(

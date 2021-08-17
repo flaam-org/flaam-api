@@ -134,6 +134,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom Settings
 
+CDN_PATH = BASE_DIR
+
+MEDIA_ROOT = "media/"
+STATIC_ROOT_DIR = "static/"
+
 APPEND_SLASH = False
 
 AUTH_USER_MODEL = "accounts.User"
