@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name="Implementation",
+            name="Discussion",
             fields=[
                 (
                     "id",
@@ -28,30 +28,26 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 ("name", models.CharField(max_length=255)),
-                ("description", models.TextField(max_length=500)),
                 ("body", models.TextField(blank=True)),
-                ("repo_url", models.URLField(blank=True)),
                 ("draft", models.BooleanField(default=True)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
                 (
                     "downvotes",
                     models.ManyToManyField(
-                        related_name="implementation_downvotes",
-                        to=settings.AUTH_USER_MODEL,
+                        related_name="discussion_downvotes", to=settings.AUTH_USER_MODEL
                     ),
                 ),
                 (
                     "tags",
                     models.ManyToManyField(
-                        related_name="implementation_tags", to="tags.Tag"
+                        related_name="discussion_tags", to="tags.Tag"
                     ),
                 ),
                 (
                     "upvotes",
                     models.ManyToManyField(
-                        related_name="implementation_upvotes",
-                        to=settings.AUTH_USER_MODEL,
+                        related_name="discussion_upvotes", to=settings.AUTH_USER_MODEL
                     ),
                 ),
                 (
@@ -64,13 +60,13 @@ class Migration(migrations.Migration):
                 (
                     "views",
                     models.ManyToManyField(
-                        related_name="implementation_views", to=settings.AUTH_USER_MODEL
+                        related_name="discussion_views", to=settings.AUTH_USER_MODEL
                     ),
                 ),
             ],
         ),
         migrations.CreateModel(
-            name="ImplementationComment",
+            name="DiscussionComment",
             fields=[
                 (
                     "id",
@@ -85,16 +81,16 @@ class Migration(migrations.Migration):
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
                 (
-                    "implementation",
+                    "discussion",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        to="implementations.implementation",
+                        to="discussions.discussion",
                     ),
                 ),
                 (
                     "upvotes",
                     models.ManyToManyField(
-                        related_name="implementation_comment_upvotes",
+                        related_name="discussion_comment_upvotes",
                         to=settings.AUTH_USER_MODEL,
                     ),
                 ),

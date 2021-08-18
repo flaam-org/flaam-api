@@ -9,9 +9,9 @@ class Implementation(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     description = models.TextField(max_length=500)
     body = models.TextField(blank=True)
-    url = models.URLField(blank=True)
+    repo_url = models.URLField(blank=True)
     # TODO: milestones field
-    tags = models.ManyToManyField(Tag, related_name="implementations_tags")
+    tags = models.ManyToManyField(Tag, related_name="implementation_tags")
     draft = models.BooleanField(default=True)
     upvotes = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="implementation_upvotes"
