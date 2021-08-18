@@ -51,6 +51,7 @@ urlpatterns = [
     path("api/token/verify", TokenVerifyView.as_view(), name="token_verify"),
     # local
     path("api/accounts", include("accounts.urls"), name="accounts"),
+    path("api/data", include("tags.urls"), name="tags"),
 ]
 
 if settings.DEBUG:
