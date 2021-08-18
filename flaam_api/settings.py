@@ -43,10 +43,11 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "drf_yasg",
     # local
+    "tags",
     "accounts",
     "ideas",
+    "discussions",
     "implementations",
-    "tags",
 ]
 
 MIDDLEWARE = [

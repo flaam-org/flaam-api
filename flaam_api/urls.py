@@ -42,6 +42,7 @@ api_v1_urlpatterns = [
     path("/accounts", include("accounts.urls"), name="accounts"),
     path("/ideas", include("ideas.urls"), name="ideas"),
     path("/implementations", include("implementations.urls"), name="implementations"),
+    path("/discussions", include("discussions.urls"), name="discussions"),
     path("/tags", include("tags.urls"), name="tags"),
 ]
 
