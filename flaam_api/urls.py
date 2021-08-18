@@ -20,11 +20,6 @@ from django.urls import include, path
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework import permissions
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView,
-)
 
 admin.site.site_header = "Flaam"
 admin.site.site_title = "Flaam"
@@ -42,16 +37,17 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
+
+api_v1_urlpatterns = [
+    path("/accounts", include("accounts.urls"), name="accounts"),
+    path("/ideas", include("ideas.urls"), name="ideas"),
+    path("/tags", include("tags.urls"), name="tags"),
+]
+
+
 urlpatterns = [
-    # admin
+    path("api/v1", include(api_v1_urlpatterns), name="api_v1"),
     path("admin/", admin.site.urls),
-    # JWT
-    path("api/token", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
-    path("api/token/verify", TokenVerifyView.as_view(), name="token_verify"),
-    # local
-    path("api/accounts", include("accounts.urls"), name="accounts"),
-    path("api/data", include("tags.urls"), name="tags"),
 ]
 
 if settings.DEBUG:
