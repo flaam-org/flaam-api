@@ -24,31 +24,34 @@ from rest_framework import permissions
 admin.site.site_header = "Flaam"
 admin.site.site_title = "Flaam"
 
+
+api_info = openapi.Info(
+    title="Flaam API",
+    default_version="v1",
+    description="Test description",
+    terms_of_service="",
+    contact=openapi.Contact(email=""),
+    license=openapi.License(name=""),
+)
+
 schema_view = get_schema_view(
-    openapi.Info(
-        title="Flaam API",
-        default_version="v1",
-        description="Test description",
-        terms_of_service="",
-        contact=openapi.Contact(email=""),
-        license=openapi.License(name=""),
-    ),
+    api_info,
     public=True,
     permission_classes=(permissions.AllowAny,),
 )
 
 
 api_v1_urlpatterns = [
-    path("/accounts", include("accounts.urls"), name="accounts"),
-    path("/ideas", include("ideas.urls"), name="ideas"),
-    path("/implementations", include("implementations.urls"), name="implementations"),
-    path("/discussions", include("discussions.urls"), name="discussions"),
-    path("/tags", include("tags.urls"), name="tags"),
+    path("accounts/", include("accounts.urls"), name="accounts"),
+    path("ideas/", include("ideas.urls"), name="ideas"),
+    path("implementations/", include("implementations.urls"), name="implementations"),
+    path("discussions/", include("discussions.urls"), name="discussions"),
+    path("tags/", include("tags.urls"), name="tags"),
 ]
 
 
 urlpatterns = [
-    path("api/v1", include(api_v1_urlpatterns), name="api_v1"),
+    path("api/v1/", include(api_v1_urlpatterns), name="api_v1"),
     path("admin/", admin.site.urls),
 ]
 

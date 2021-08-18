@@ -143,7 +143,7 @@ CDN_PATH = BASE_DIR
 MEDIA_ROOT = "media/"
 STATIC_ROOT_DIR = "static/"
 
-APPEND_SLASH = False
+# APPEND_SLASH = False
 
 AUTH_USER_MODEL = "accounts.User"
 
@@ -160,3 +160,16 @@ INTERNAL_IPS = [
     "127.0.0.1",
     "localhost",
 ]
+
+
+SWAGGER_SETTINGS = {
+    "DEFAULT_INFO": "flaam_api.urls.api_info",
+    "USE_SESSION_AUTH": False,
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+        }
+    },
+}
