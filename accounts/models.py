@@ -1,14 +1,10 @@
-from pathlib import Path
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from tags.models import Tag
+
+from .utils import avatar_path
 from .validators import UsernameValidator
-
-
-def avatar_path(instance, filename):
-    ext = Path(filename).suffix[1:].lower()
-    return f"avatars/avatar_{instance.pk}.{ext}"
 
 
 class User(AbstractUser):
@@ -41,3 +37,7 @@ class User(AbstractUser):
         null=True,
         help_text="A short description about the user",
     )
+    favourite_tags = models.ManyToManyField(Tag, blank=True)
+
+    def __str__(self) -> str:
+        return self.username
