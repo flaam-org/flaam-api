@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     # local
     "accounts",
     "ideas",
+    "implementations",
     "tags",
 ]
 

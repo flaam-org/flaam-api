@@ -41,6 +41,7 @@ schema_view = get_schema_view(
 api_v1_urlpatterns = [
     path("/accounts", include("accounts.urls"), name="accounts"),
     path("/ideas", include("ideas.urls"), name="ideas"),
+    path("/implementations", include("implementations.urls"), name="implementations"),
     path("/tags", include("tags.urls"), name="tags"),
 ]
 
