@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -5,7 +7,7 @@ from .validators import UsernameValidator
 
 
 def avatar_path(instance, filename):
-    ext = filename.split(".")[-1]
+    ext = Path(filename).suffix[1:].lower()
     return f"avatars/avatar_{instance.pk}.{ext}"
 
 
