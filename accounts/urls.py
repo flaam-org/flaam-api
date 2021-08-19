@@ -5,10 +5,15 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
+from accounts.views import PublicUserProfileView, UserProfileView, UserRegisterView
+
 urlpatterns = [
     # JWT
-    path("token", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
-    path("token/verify", TokenVerifyView.as_view(), name="token_verify"),
-
+    path("login", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("login/refresh", TokenRefreshView.as_view(), name="token_refresh"),
+    path("login/verify", TokenVerifyView.as_view(), name="token_verify"),
+    # Users
+    path("user", UserRegisterView.as_view(), name="user_register"),
+    path("user/profile", UserProfileView.as_view(), name="user_profile"),
+    path("user/<int:pk>", PublicUserProfileView.as_view(), name="user_public"),
 ]

@@ -163,6 +163,7 @@ INTERNAL_IPS = [
 
 
 SWAGGER_SETTINGS = {
+    "EXCEPTION_HANDLER": "flaam_api.utils.custom_exception_handler",
     "DEFAULT_INFO": "flaam_api.urls.api_info",
     "USE_SESSION_AUTH": False,
     "SECURITY_DEFINITIONS": {
