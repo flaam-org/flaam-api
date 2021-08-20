@@ -5,7 +5,13 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
-from accounts.views import PublicUserProfileView, UserProfileView, UserRegisterView
+from accounts.views import (
+    PublicUserProfileView,
+    ResetPasswordTokenView,
+    ResetPasswordView,
+    UserProfileView,
+    UserRegisterView,
+)
 
 urlpatterns = [
     # JWT
@@ -16,4 +22,15 @@ urlpatterns = [
     path("user", UserRegisterView.as_view(), name="user_register"),
     path("user/profile", UserProfileView.as_view(), name="user_profile"),
     path("user/<int:pk>", PublicUserProfileView.as_view(), name="user_public"),
+    # password
+    path(
+        "user/reset-password",
+        ResetPasswordTokenView.as_view(),
+        name="reset_password",
+    ),
+    path(
+        "user/reset-password/<str:token>",
+        ResetPasswordView.as_view(),
+        name="reset_password",
+    ),
 ]

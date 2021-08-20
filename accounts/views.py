@@ -1,7 +1,10 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.validators import EmailValidator
+from django.utils.timezone import datetime, timedelta
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, ParseError
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -9,8 +12,9 @@ from rest_framework.views import APIView
 
 from flaam_api.exceptions import NotFound
 
-from .models import User
+from .models import PasswordResetToken, User
 from .serializers import PublicUserSerializer, UserSerializer
+from .validators import PasswordValidator
 
 UserModel: User = get_user_model()
 
@@ -78,6 +82,7 @@ class UserProfileView(APIView):
     @swagger_auto_schema(
         responses={
             204: "No content",
+            401: "Unauthorized",
         },
     )
     def delete(self, request: Request) -> Response:
@@ -112,11 +117,7 @@ class PublicUserProfileView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ResetPasswordView(APIView):
-    """
-    Reset password
-    """
-
+class ResetPasswordTokenView(APIView):
     permission_classes = (AllowAny,)
 
     @swagger_auto_schema(
@@ -129,6 +130,82 @@ class ResetPasswordView(APIView):
     )
     def post(self, request: Request) -> Response:
         """
+        generate password reset token
+        """
+        email = request.data.get("email")
+        # validate email
+        if not email:
+            raise ParseError(detail={"detail": "Email is required."})
+        EmailValidator()(email)
+
+        try:
+            user = UserModel.objects.get(email=email)
+        except UserModel.DoesNotExist:
+            raise NotFound(detail={"detail": "User does not exist."})
+
+        # generate token
+        reset_token = PasswordResetToken.objects.get_or_create(user=user)
+        print(reset_token)
+        # TODO: send email
+        email = True
+        if email:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            raise APIException(detail={"detail": "Failed to send Email."})
+
+
+class ResetPasswordView(APIView):
+
+    permission_classes = (AllowAny,)
+
+    def get_object(self, token):
+        try:
+            token = PasswordResetToken.objects.get(token=token)
+            is_token_valid = (
+                token.created_at
+                + timedelta(minutes=settings.PASSWORD_RESET_TOKEN_VALIDITY)
+                > datetime.now()
+            )
+            if is_token_valid:
+                return token
+            token.delete()
+            raise PasswordResetToken.DoesNotExist
+        except PasswordResetToken.DoesNotExist:
+            raise NotFound(detail={"detail": "Invalid token."})
+
+    def get(self, request: Request, token) -> Response:
+        """
+        Check reset token
+        """
+        reset_token: PasswordResetToken = self.get_object(token)
+        return Response(
+            {
+                "username": reset_token.user.username,
+                "email": reset_token.user.email,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    @swagger_auto_schema(
+        request_body="",
+        responses={
+            200: "",
+            404: "Invalid token",
+        },
+    )
+    def post(self, request: Request, token) -> Response:
+        """
         Reset password
         """
-        raise APIException(detail="Not implemented yet.")
+        reset_token: PasswordResetToken = self.get_object(token)
+        password = request.data.get("password")
+        if not password:
+            raise ParseError(detail={"detail": "Password is required."})
+
+        # validate password
+        PasswordValidator()(password)
+
+        reset_token.user.set_password(password)
+        reset_token.delete()
+        # TODO: send email
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -13,3 +13,13 @@ class UsernameValidator(validators.RegexValidator):
         "It shouldn't contain consecutive underscores"
     )
     flags = 0
+
+
+class PasswordValidator(validators.RegexValidator):
+    regex = r"^(?=.{8,32}$)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[@#$%^&+=]).*$"
+    message = _(
+        "Password must be 8 to 32 characters long. "
+        "It must contain at least one uppercase letter, "
+        "one lowercase letter, one number and one special character."
+    )
+    flags = 0

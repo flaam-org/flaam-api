@@ -143,7 +143,7 @@ CDN_PATH = BASE_DIR
 MEDIA_ROOT = "media/"
 STATIC_ROOT_DIR = "static/"
 
-# APPEND_SLASH = False
+PASSWORD_RESET_TOKEN_VALIDITY = 120  # minutes
 
 AUTH_USER_MODEL = "accounts.User"
 
