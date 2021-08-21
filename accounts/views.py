@@ -95,6 +95,9 @@ class UserProfileView(APIView):
 
 
 class PublicUserProfileView(APIView):
+    """
+    Public User Profile
+    """
     def get_object(self, pk):
         try:
             return UserModel.objects.get(pk=pk)
@@ -118,6 +121,9 @@ class PublicUserProfileView(APIView):
 
 
 class ResetPasswordTokenView(APIView):
+    """
+    Reset Password Token
+    """
     permission_classes = (AllowAny,)
 
     @swagger_auto_schema(
@@ -155,6 +161,9 @@ class ResetPasswordTokenView(APIView):
 
 
 class ResetPasswordView(APIView):
+    """
+    Reset Password
+    """
 
     permission_classes = (AllowAny,)
 
@@ -187,7 +196,7 @@ class ResetPasswordView(APIView):
         )
 
     @swagger_auto_schema(
-        request_body="",
+        # request_body="",
         responses={
             200: "",
             404: "Invalid token",

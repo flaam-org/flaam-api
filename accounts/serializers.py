@@ -6,6 +6,9 @@ UserModel = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """
+    User serializer
+    """
     class Meta:
         model = UserModel
         fields = (
