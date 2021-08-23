@@ -13,7 +13,11 @@ from rest_framework.views import APIView
 from flaam_api.exceptions import NotFound
 
 from .models import PasswordResetToken, User
-from .serializers import PublicUserSerializer, UserSerializer
+from .serializers import (
+    PublicUserSerializer,
+    ResetPasswordTokenSerializer,
+    UserSerializer,
+)
 from .validators import PasswordValidator
 
 UserModel: User = get_user_model()
@@ -98,7 +102,8 @@ class PublicUserProfileView(APIView):
     """
     Public User Profile
     """
-    def get_object(self, pk):
+
+    def get_object(self, pk: int) -> User:
         try:
             return UserModel.objects.get(pk=pk)
         except UserModel.DoesNotExist:
@@ -111,7 +116,7 @@ class PublicUserProfileView(APIView):
             404: "User does not exist.",
         },
     )
-    def get(self, request, pk):
+    def get(self, request: Request, pk: int) -> Response:
         """
         Read public user profile
         """
@@ -124,10 +129,11 @@ class ResetPasswordTokenView(APIView):
     """
     Reset Password Token
     """
+
     permission_classes = (AllowAny,)
 
     @swagger_auto_schema(
-        request_body=UserSerializer,
+        request_body=ResetPasswordTokenSerializer,
         responses={
             200: UserSerializer,
             400: "Bad request",
@@ -138,22 +144,13 @@ class ResetPasswordTokenView(APIView):
         """
         generate password reset token
         """
-        email = request.data.get("email")
-        # validate email
-        if not email:
-            raise ParseError(detail={"detail": "Email is required."})
-        EmailValidator()(email)
-
-        try:
-            user = UserModel.objects.get(email=email)
-        except UserModel.DoesNotExist:
-            raise NotFound(detail={"detail": "User does not exist."})
+        serializer = ResetPasswordTokenSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            user = serializer.validated_data["user"]
 
         # generate token
         reset_token = PasswordResetToken.objects.get_or_create(user=user)
-        print(reset_token)
-        # TODO: send email
-        email = True
+        email = True  # TODO: send email
         if email:
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
@@ -167,7 +164,7 @@ class ResetPasswordView(APIView):
 
     permission_classes = (AllowAny,)
 
-    def get_object(self, token):
+    def get_object(self, token: str) -> PasswordResetToken:
         try:
             token = PasswordResetToken.objects.get(token=token)
             is_token_valid = (

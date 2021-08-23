@@ -9,6 +9,7 @@ class UserSerializer(serializers.ModelSerializer):
     """
     User serializer
     """
+
     class Meta:
         model = UserModel
         fields = (
@@ -62,3 +63,16 @@ class PublicUserSerializer(serializers.ModelSerializer):
             "last_login",
             "date_joined",
         )
+
+
+class ResetPasswordTokenSerializer(serializers.Serializer):
+    """
+    Serializer to get reset password token
+    """
+
+    email = serializers.EmailField(required=True)
+
+    def validate_email(self, value):
+        if UserModel.objects.filter(email=value).exists():
+            return value
+        raise ValidationError("Email does not exist")
