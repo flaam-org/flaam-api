@@ -179,3 +179,11 @@ SWAGGER_SETTINGS = {
         }
     },
 }
+
+
+# Heroku Settings
+
+if getenv("HEROKU_ENVIRONMENT"):
+    import django_heroku
+
+    django_heroku.settings(locals())
