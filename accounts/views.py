@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.validators import EmailValidator
 from django.utils.timezone import datetime, timedelta
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.exceptions import APIException, ParseError
@@ -45,6 +46,48 @@ class UserRegisterView(APIView):
                 serializer.data,
                 status=status.HTTP_201_CREATED,
             )
+
+
+class UserExistsView(APIView):
+    """
+    View to query if given username or email already exists
+    """
+
+    permission_classes = (AllowAny,)
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "username",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "email",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_STRING,
+            ),
+        ],
+        responses={
+            204: "Username or email already exist",
+            400: "Bad request",
+            404: "Username or email does not exist",
+        },
+    )
+    def get(self, request: Request) -> Response:
+        username = request.query_params.get("username")
+        email = request.query_params.get("email")
+
+        if username:
+            exists = UserModel.objects.filter(username=username).exists()
+        elif email:
+            exists = UserModel.objects.filter(email=email).exists()
+        else:
+            raise ParseError("Provide either username or email")
+
+        if exists:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class UserProfileView(APIView):
