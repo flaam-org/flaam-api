@@ -25,9 +25,7 @@ UserModel: User = get_user_model()
 
 
 class UserRegisterView(APIView):
-    """
-    User Model
-    """
+    """Register a new user"""
 
     permission_classes = (AllowAny,)
 
@@ -49,9 +47,7 @@ class UserRegisterView(APIView):
 
 
 class UserExistsView(APIView):
-    """
-    View to query if given username or email already exists
-    """
+    """Query if given username or email already exists"""
 
     permission_classes = (AllowAny,)
 
@@ -93,9 +89,7 @@ class UserExistsView(APIView):
 
 
 class UserProfileView(APIView):
-    """
-    User Profile
-    """
+    """User Profile"""
 
     @swagger_auto_schema(
         responses={
@@ -104,9 +98,7 @@ class UserProfileView(APIView):
         },
     )
     def get(self, request: Request) -> Response:
-        """
-        Get user profile
-        """
+        """Get user profile"""
         serializer = UserSerializer(request.user)
         print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -120,9 +112,7 @@ class UserProfileView(APIView):
         },
     )
     def put(self, request: Request) -> Response:
-        """
-        Update user profile
-        """
+        """Update user profile"""
         serializer = UserSerializer(request.user, data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -144,9 +134,7 @@ class UserProfileView(APIView):
 
 
 class PublicUserProfileView(APIView):
-    """
-    Public User Profile
-    """
+    """Public User Profile"""
 
     def get_object(self, pk: int) -> User:
         try:
@@ -162,18 +150,14 @@ class PublicUserProfileView(APIView):
         },
     )
     def get(self, request: Request, pk: int) -> Response:
-        """
-        Read public user profile
-        """
+        """Read public user profile"""
         user = self.get_object(pk)
         serializer = PublicUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class ResetPasswordTokenView(APIView):
-    """
-    Reset Password Token
-    """
+    """Obtain Reset Password Token"""
 
     permission_classes = (AllowAny,)
 
@@ -186,9 +170,7 @@ class ResetPasswordTokenView(APIView):
         },
     )
     def post(self, request: Request) -> Response:
-        """
-        generate password reset token
-        """
+        """generate password reset token"""
         serializer = ResetPasswordTokenSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             user = serializer.validated_data["user"]
@@ -203,9 +185,7 @@ class ResetPasswordTokenView(APIView):
 
 
 class ResetPasswordView(APIView):
-    """
-    Reset Password
-    """
+    """Reset Password"""
 
     permission_classes = (AllowAny,)
 
@@ -225,9 +205,7 @@ class ResetPasswordView(APIView):
             raise NotFound(detail={"detail": "Invalid token."})
 
     def get(self, request: Request, token) -> Response:
-        """
-        Check reset token
-        """
+        """Check reset token"""
         reset_token: PasswordResetToken = self.get_object(token)
         return Response(
             {
@@ -245,9 +223,7 @@ class ResetPasswordView(APIView):
         },
     )
     def post(self, request: Request, token) -> Response:
-        """
-        Reset password
-        """
+        """Reset password"""
         reset_token: PasswordResetToken = self.get_object(token)
         password = request.data.get("password")
         if not password:

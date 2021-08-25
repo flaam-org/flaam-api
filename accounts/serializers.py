@@ -6,9 +6,7 @@ UserModel = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """
-    User serializer
-    """
+    """User serializer"""
 
     class Meta:
         model = UserModel
@@ -46,9 +44,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class PublicUserSerializer(serializers.ModelSerializer):
-    """
-    For public user profile
-    """
+    """For public user profile"""
 
     class Meta:
         model = UserModel
@@ -66,9 +62,7 @@ class PublicUserSerializer(serializers.ModelSerializer):
 
 
 class ResetPasswordTokenSerializer(serializers.Serializer):
-    """
-    Serializer to get reset password token
-    """
+    """Serializer to get reset password token"""
 
     email = serializers.EmailField(required=True)
 
