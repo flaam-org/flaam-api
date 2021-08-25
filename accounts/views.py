@@ -19,7 +19,7 @@ from .serializers import (
     ResetPasswordTokenSerializer,
     UserSerializer,
 )
-from .validators import PasswordValidator
+from .validators import PasswordValidator, UsernameValidator
 
 UserModel: User = get_user_model()
 
@@ -79,8 +79,10 @@ class UserExistsView(APIView):
         email = request.query_params.get("email")
 
         if username:
+            UsernameValidator()(username)
             exists = UserModel.objects.filter(username=username).exists()
         elif email:
+            EmailValidator()(email)
             exists = UserModel.objects.filter(email=email).exists()
         else:
             raise ParseError("Provide either username or email")
