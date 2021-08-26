@@ -27,20 +27,13 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "last_login", "date_joined")
 
     def create(self, validated_data):
-        if validated_data["password"]:
-            user = UserModel.objects.create(**validated_data)
-            user.set_password(validated_data["password"])
-            user.save()
-        else:
-            raise ValidationError("Password is required")
-
-        return user
+        return UserModel.objects.create_user(**validated_data)
 
     def update(self, instance, validated_data):
-        if validated_data["password"]:
-            instance.set_password(validated_data["password"])
-        instance.save()
-        return instance
+        password = validated_data.pop("password", None)
+        if password:
+            instance.set_password(password)
+        return super().update(instance, validated_data)
 
 
 class PublicUserSerializer(serializers.ModelSerializer):
