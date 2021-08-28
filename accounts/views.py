@@ -10,6 +10,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -40,7 +41,7 @@ class UserRegisterView(APIView):
     @swagger_auto_schema(
         request_body=UserSerializer,
         responses={
-            201: UserSerializer,
+            201: TokenObtainPairResponseSerializer,
             400: "Bad request",
         },
     )
@@ -48,8 +49,13 @@ class UserRegisterView(APIView):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
+            refresh = RefreshToken.for_user(serializer.instance)
+            data = {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            }
             return Response(
-                serializer.data,
+                data,
                 status=status.HTTP_201_CREATED,
             )
 
