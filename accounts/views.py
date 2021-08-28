@@ -118,7 +118,6 @@ class UserProfileView(APIView):
     def get(self, request: Request) -> Response:
         """Get user profile"""
         serializer = UserSerializer(request.user)
-        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
