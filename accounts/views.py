@@ -10,6 +10,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+    TokenVerifyView,
+)
 
 from flaam_api.exceptions import NotFound
 
@@ -17,6 +22,9 @@ from .models import PasswordResetToken, User
 from .serializers import (
     PublicUserSerializer,
     ResetPasswordTokenSerializer,
+    TokenObtainPairResponseSerializer,
+    TokenRefreshResponseSerializer,
+    TokenVerifyResponseSerializer,
     UserSerializer,
 )
 from .validators import PasswordValidator, UsernameValidator
@@ -236,3 +244,27 @@ class ResetPasswordView(APIView):
         reset_token.delete()
         # TODO: send email
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DecoratedTokenObtainPairView(TokenObtainPairView):
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: TokenObtainPairResponseSerializer},
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class DecoratedTokenRefreshView(TokenRefreshView):
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: TokenRefreshResponseSerializer},
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
+
+
+class DecoratedTokenVerifyView(TokenVerifyView):
+    @swagger_auto_schema(
+        responses={status.HTTP_200_OK: TokenVerifyResponseSerializer},
+    )
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
