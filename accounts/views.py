@@ -153,7 +153,7 @@ class PublicUserProfileView(APIView):
         try:
             return UserModel.objects.get(pk=pk)
         except UserModel.DoesNotExist:
-            raise NotFound(detail={"detail": "User does not exist."})
+            raise NotFound("User does not exist.")
 
     @swagger_auto_schema(
         responses={
