@@ -29,7 +29,6 @@ from .serializers import (
     UserSerializer,
 )
 from .validators import PasswordValidator, UsernameValidator
-from django.core.exceptions import ValidationError
 
 UserModel: User = get_user_model()
 
@@ -89,21 +88,18 @@ class UserExistsView(APIView):
         username = request.query_params.get("username")
         email = request.query_params.get("email")
 
-        try:
-            if username:
-                UsernameValidator()(username)
-                exists = UserModel.objects.filter(username=username).exists()
-            elif email:
-                EmailValidator()(email)
-                exists = UserModel.objects.filter(email=email).exists()
-            else:
-                raise ParseError("Provide either username or email")
+        if username:
+            UsernameValidator()(username)
+            exists = UserModel.objects.filter(username=username).exists()
+        elif email:
+            EmailValidator()(email)
+            exists = UserModel.objects.filter(email=email).exists()
+        else:
+            raise ParseError("Provide either username or email")
 
-            if exists:
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        except ValidationError as v:
-            return Response(status=status.HTTP_400_BAD_REQUEST,data={"message":v.message})
+        if exists:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class UserProfileView(APIView):
