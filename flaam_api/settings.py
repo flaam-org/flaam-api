@@ -155,6 +155,7 @@ PASSWORD_RESET_TOKEN_VALIDITY = 120  # minutes
 AUTH_USER_MODEL = "accounts.User"
 
 REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "flaam_api.exceptions.exception_handler",
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
@@ -170,7 +171,6 @@ INTERNAL_IPS = [
 
 
 SWAGGER_SETTINGS = {
-    "EXCEPTION_HANDLER": "flaam_api.exceptions.exception_handler",
     "DEFAULT_INFO": "flaam_api.urls.api_info",
     "USE_SESSION_AUTH": False,
     "SECURITY_DEFINITIONS": {

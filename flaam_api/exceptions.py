@@ -2,16 +2,14 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import status
 from rest_framework.exceptions import APIException
 from rest_framework.exceptions import ValidationError as DRFValidationError
+from rest_framework.fields import get_error_detail
 from rest_framework.views import exception_handler as drf_exception_handler
 
 
 def exception_handler(exc, context):
 
     if isinstance(exc, DjangoValidationError):
-        if hasattr(exc, "message_dict"):
-            exc = DRFValidationError(detail=exc.message_dict)
-        else:
-            exc = DRFValidationError(detail=exc.message)
+        exc = DRFValidationError(detail={"detail": get_error_detail(exc)[0]})
 
     # Call REST framework's default exception handler first,
     # to get the standard error response.
