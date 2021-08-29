@@ -5,7 +5,7 @@ from django.utils.timezone import datetime, timedelta
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.exceptions import APIException, ParseError
+from rest_framework.exceptions import APIException, NotFound, ParseError
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -16,8 +16,6 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
     TokenVerifyView,
 )
-
-from flaam_api.exceptions import NotFound
 
 from .models import PasswordResetToken, User
 from .serializers import (
