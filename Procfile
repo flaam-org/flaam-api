@@ -1,1 +1,1 @@
-web: gunicorn flaam_api.wsgi
+web: gunicorn flaam_api.wsgi --log-file -
