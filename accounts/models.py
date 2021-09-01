@@ -38,7 +38,9 @@ class User(AbstractUser):
         null=True,
         help_text="A short description about the user",
     )
-    favourite_tags = models.ManyToManyField(Tag, blank=True)
+    favourite_tags = models.ManyToManyField(
+        Tag, blank=True, related_name="user_favourite_tags"
+    )
 
     def __str__(self) -> str:
         return self.username

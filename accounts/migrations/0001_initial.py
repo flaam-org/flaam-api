@@ -130,7 +130,12 @@ class Migration(migrations.Migration):
                         null=True,
                     ),
                 ),
-                ("favourite_tags", models.ManyToManyField(blank=True, to="tags.Tag")),
+                (
+                    "favourite_tags",
+                    models.ManyToManyField(
+                        blank=True, related_name="user_favourite_tags", to="tags.Tag"
+                    ),
+                ),
                 (
                     "groups",
                     models.ManyToManyField(
