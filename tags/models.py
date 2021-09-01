@@ -12,4 +12,4 @@ class Tag(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return self.name
+        return f"T{self.id} - {self.name}"
