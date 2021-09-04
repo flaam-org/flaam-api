@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.validators import EmailValidator
+from django.shortcuts import get_object_or_404
 from django.utils.timezone import datetime, timedelta
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -147,22 +148,16 @@ class UserProfileView(APIView):
 class PublicUserProfileView(APIView):
     """Public User Profile"""
 
-    def get_object(self, pk: int) -> User:
-        try:
-            return UserModel.objects.get(pk=pk)
-        except UserModel.DoesNotExist:
-            raise NotFound("User does not exist.")
-
     @swagger_auto_schema(
         responses={
             200: PublicUserSerializer,
             401: "Unauthorized",
-            404: "User does not exist.",
+            404: "Not found.",
         },
     )
     def get(self, request: Request, pk: int) -> Response:
         """Read public user profile"""
-        user = self.get_object(pk)
+        user = get_object_or_404(UserModel, pk=pk)
         serializer = PublicUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
