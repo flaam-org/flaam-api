@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+from datetime import timedelta
 from os import getenv
 from pathlib import Path
 
@@ -169,6 +170,10 @@ INTERNAL_IPS = [
     "localhost",
 ]
 
+ACCESS_TOKEN_LIFETIME = timedelta(minutes=30)
+REFRESH_TOKEN_LIFETIME = timedelta(days=30)
+
+UPDATE_LAST_LOGIN = True
 
 SWAGGER_SETTINGS = {
     "DEFAULT_INFO": "flaam_api.urls.api_info",
