@@ -2,8 +2,6 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from tags.serializers import TagSerializer
-
 UserModel = get_user_model()
 
 
@@ -28,17 +26,8 @@ class UserSerializer(serializers.ModelSerializer):
         )
         extra_kwargs = {
             "password": {"write_only": True},
-            "favourite_tags": {"write_only": True},
         }
         read_only_fields = ("id", "last_login", "date_joined")
-
-    def to_representation(self, instance):
-        """
-        Override to_representation to add fav_tags to the representation
-        """
-        repr = super().to_representation(instance)
-        repr["favourite_tags"] = TagSerializer(instance.favourite_tags, many=True).data
-        return repr
 
     def create(self, validated_data):
         return UserModel.objects.create_user(**validated_data)
@@ -52,8 +41,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 class PublicUserSerializer(serializers.ModelSerializer):
     """For public user profile"""
-
-    favourite_tags = TagSerializer(many=True, read_only=True)
 
     class Meta:
         model = UserModel
