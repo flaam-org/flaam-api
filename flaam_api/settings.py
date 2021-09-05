@@ -147,11 +147,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Custom Settings
 
 CDN_PATH = BASE_DIR
-
 MEDIA_ROOT = "media/"
 STATIC_ROOT_DIR = "static/"
-
-PASSWORD_RESET_TOKEN_VALIDITY = 120  # minutes
 
 AUTH_USER_MODEL = "accounts.User"
 
@@ -165,15 +162,11 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 30,
 }
 
-INTERNAL_IPS = [
-    "127.0.0.1",
-    "localhost",
-]
-
-ACCESS_TOKEN_LIFETIME = timedelta(minutes=30)
-REFRESH_TOKEN_LIFETIME = timedelta(days=30)
-
-UPDATE_LAST_LOGIN = True
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=90),
+    "UPDATE_LAST_LOGIN": True,
+}
 
 SWAGGER_SETTINGS = {
     "DEFAULT_INFO": "flaam_api.urls.api_info",
@@ -187,10 +180,17 @@ SWAGGER_SETTINGS = {
     },
 }
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+    "localhost",
+]
+
 CORS_ALLOWED_ORIGINS = [
     "https://flaam-react.yeager.workers.dev",
     "http://localhost:3000",
 ]
+
+PASSWORD_RESET_TOKEN_VALIDITY = timedelta(minutes=30)
 
 # Heroku Settings
 
