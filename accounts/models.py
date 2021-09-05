@@ -12,8 +12,8 @@ class User(AbstractUser):
     username = models.CharField(
         error_messages={"unique": "A user with that username already exists."},
         help_text=(
-            "Username must be 4 to 32 characters long.\n"
-            "It may only contain letters, numbers and alphabets.\n"
+            "Username must be 4 to 15 characters long.\n"
+            "It may only contain lowercase alphabets, numbers and underscores.\n"
             "It shouldn't start or end with underscores.\n"
             "It shouldn't contain consecutive underscores"
         ),
