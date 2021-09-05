@@ -73,7 +73,7 @@ class TagListView(APIView):
         },
     )
     def post(self, request: Request) -> Response:
-        serializer = TagDetailSerializer(request.data, owner=request.user)
+        serializer = TagDetailSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
