@@ -1,38 +1,46 @@
-from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from .models import Tag
 from .serializers import TagDetailSerializer, TagSerializer
 
 
-class TagDetailView(APIView):
+class TagDetailView(RetrieveAPIView):
+    serializer_class = TagDetailSerializer
+    lookup_field = "name"
+    queryset = Tag.objects.all()
+
     @swagger_auto_schema(
         tags=("tags",),
         operation_summary="Get tag details",
         responses={
-            status.HTTP_200_OK: TagDetailSerializer,
-            status.HTTP_404_NOT_FOUND: "Not found.",
+            200: TagDetailSerializer,
+            401: "Unauthorized.",
+            404: "Not found.",
         },
     )
     def get(self, request: Request, name: str) -> Response:
-        tags = get_object_or_404(Tag, name=name)
-        serializer = TagDetailSerializer(tags)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return super().get(request, name)
 
 
-class TagListView(APIView):
+class TagListView(ListCreateAPIView):
+
+    pagination_class = LimitOffsetPagination
+    serializer_class = TagSerializer
+
     def get_queryset(self):
-        tags = None
         tag_name = self.request.query_params.get("name", None)
         tag_ids = self.request.query_params.get("ids", None)
         tags = Tag.objects.all()
         if tag_name:
-            tags = tags.filter(name__search=tag_name)[:10]
+            # TODO: improve search
+            # https://docs.djangoproject.com/en/3.2/ref/contrib/postgres/search/
+            tags = tags.filter(name__search=tag_name)
         elif tag_ids:
             tags = tags.filter(id__in=tag_ids.split(","))
         return tags
@@ -51,29 +59,25 @@ class TagListView(APIView):
                 "ids",
                 in_=openapi.IN_QUERY,
                 type=openapi.TYPE_STRING,
-                description="Search tags by id",
+                description="Get tags by id",
             ),
         ),
         responses={
-            status.HTTP_200_OK: TagSerializer,
+            200: TagSerializer,
+            401: "Unauthorized.",
         },
     )
     def get(self, request: Request) -> Response:
-        serializer = TagSerializer(self.get_queryset(), many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return super().get(request)
 
     @swagger_auto_schema(
         tags=("tags",),
         operation_summary="Create a new tag",
-        request_body=TagDetailSerializer,
         responses={
-            status.HTTP_201_CREATED: TagDetailSerializer,
-            status.HTTP_400_BAD_REQUEST: "Bad request.",
-            status.HTTP_401_UNAUTHORIZED: "Unauthorized.",
+            201: TagDetailSerializer,
+            400: "Bad request.",
+            401: "Unauthorized.",
         },
     )
     def post(self, request: Request) -> Response:
-        serializer = TagDetailSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return super().post(request)

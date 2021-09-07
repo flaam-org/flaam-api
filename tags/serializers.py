@@ -10,6 +10,7 @@ class TagDetailSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ("id", "name", "description", "created_at", "updated_at")
         read_only_fields = ("id", "created_at", "updated_at")
+        # TODO: add related fields
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -17,5 +18,5 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = ("id", "name")
-        read_only_fields = ("id",)
+        fields = ("id", "name", "description", "created_at", "updated_at")
+        read_only_fields = ("id", "created_at", "updated_at")
