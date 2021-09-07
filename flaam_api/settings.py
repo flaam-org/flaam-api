@@ -159,7 +159,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
+    "DEFAULT_PAGINATION_CLASS": "flaam_api.utils.CustomLimitOffsetPagination",
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html

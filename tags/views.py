@@ -2,9 +2,10 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
-from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.request import Request
 from rest_framework.response import Response
+
+from flaam_api.utils import CustomLimitOffsetPagination
 
 from .models import Tag
 from .serializers import TagDetailSerializer, TagSerializer
@@ -30,7 +31,7 @@ class TagDetailView(RetrieveAPIView):
 
 class TagListView(ListCreateAPIView):
 
-    pagination_class = LimitOffsetPagination
+    pagination_class = CustomLimitOffsetPagination
     serializer_class = TagSerializer
 
     def get_queryset(self):
