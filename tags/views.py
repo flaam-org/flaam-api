@@ -30,11 +30,11 @@ class TagListView(APIView):
         tags = None
         tag_name = self.request.query_params.get("name", None)
         tag_ids = self.request.query_params.get("ids", None)
-        print(tag_name, tag_ids)
+        tags = Tag.objects.all()
         if tag_name:
-            tags = Tag.objects.filter(name__search=tag_name)[:10]
+            tags = tags.filter(name__search=tag_name)[:10]
         elif tag_ids:
-            tags = Tag.objects.filter(id__in=tag_ids.split(","))[:10]
+            tags = tags.filter(id__in=tag_ids.split(","))
         return tags
 
     @swagger_auto_schema(
