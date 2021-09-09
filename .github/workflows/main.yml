@@ -15,22 +15,8 @@ jobs:
       - name: Get commit details
         id: commit_info
         run: |
-          urlencode() {
-              old_lc_collate=$LC_COLLATE
-              LC_COLLATE=C
-              local length="${#1}"
-              for (( i = 0; i < length; i++ )); do
-                  local c="${1:$i:1}"
-                  case $c in
-                      [a-zA-Z0-9.~_-]) printf '%s' "$c" ;;
-                      *) printf '%%%02X' "'$c" ;;
-                  esac
-              done
-              LC_COLLATE=$old_lc_collate
-          }
           echo ::set-output name=commit_count::$(git rev-list --count ${{ github.event.before }}..${{ github.event.after }} || echo 0)
-          $COMMIT_LOG=$(urlencode $(git log --pretty=format:"%h %s" --abbrev-commit ${{ github.event.before }}..${{ github.event.after }} || echo null))
-          echo ::set-output name=commit_log::$COMMIT_LOG
+          echo ::set-output name=commit_log::$(urlencode $(git log --pretty=format:"%h %s" --abbrev-commit ${{ github.event.before }}..${{ github.event.after }} || echo null))
 
       - name: Send a message about the latest commit
         run: |
@@ -38,14 +24,14 @@ jobs:
           -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
           -d disable_notification=true \
           -d parse_mode=HTML \
-          -d text=\
-          "↗️ <b>PUSH</b>%0A\
-          <b>was made at:</b> ${{ github.repository }}%0A\
-          <b>by:</b> <u>${{ github.actor }}</u>%0A\
-          <b>commits pushed:</b> ${{ steps.commit_info.outputs.commit_count }}%0A\
+          --data-urlencode "text=\
+          ↗️ <b>PUSH</b> \
+          <b>was made at:</b> ${{ github.repository }} \
+          <b>by:</b> <u>${{ github.actor }}</u> \
+          <b>commits pushed:</b> ${{ steps.commit_info.outputs.commit_count }} \
           <b>commit log:</b>%0A\
-          <pre>${{ steps.commit_info.outputs.commit_log }}</pre>%0A\
-          %0A\
+          <pre>${{ steps.commit_info.outputs.commit_log }}</pre> \
+          \
           <b>url:</b> https://github.com/${{ github.repository }}/commit/${{ github.sha }}" \
           https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
 
