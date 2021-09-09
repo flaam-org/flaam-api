@@ -1,11 +1,10 @@
-name: Main CI
+name: CI
 
-on:
-  push:
+on: push
 
 jobs:
-  build:
-    name: Notify
+  test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
 
@@ -16,17 +15,22 @@ jobs:
       - name: Get commit details
         id: commit_info
         run: |
-          echo $GITHUB_CONTEXT
-          echo ::set-output name=commit_count::$(git rev-list --count ${{ github.event.before }}..${{ github.event.after }} || echo null)
-          FILES_CHANGED="$(git diff-tree --no-commit-id --name-status --diff-filter=ADMR -r ${{ github.event.before }} ${{ github.event.after }} || echo null)"
-          FILES_CHANGED="${FILES_CHANGED//$'A\t'/[A]~ }"
-          FILES_CHANGED="${FILES_CHANGED//$'D\t'/[D]~ }"
-          FILES_CHANGED="${FILES_CHANGED//$'M\t'/[M]~ }"
-          FILES_CHANGED="${FILES_CHANGED//$'R\t'/[R]~ }"
-          FILES_CHANGED="${FILES_CHANGED//'%'/'%25'}"
-          FILES_CHANGED="${FILES_CHANGED//$'\n'/'%0A'}"
-          FILES_CHANGED="${FILES_CHANGED//$'\r'/'%0D'}"
-          echo ::set-output name=files_changed::$FILES_CHANGED
+          urlencode() {
+              old_lc_collate=$LC_COLLATE
+              LC_COLLATE=C
+              local length="${#1}"
+              for (( i = 0; i < length; i++ )); do
+                  local c="${1:$i:1}"
+                  case $c in
+                      [a-zA-Z0-9.~_-]) printf '%s' "$c" ;;
+                      *) printf '%%%02X' "'$c" ;;
+                  esac
+              done
+              LC_COLLATE=$old_lc_collate
+          }
+          echo ::set-output name=commit_count::$(git rev-list --count ${{ github.event.before }}..${{ github.event.after }} || echo 0)
+          $COMMIT_LOG=$(urlencode $(git log --pretty=format:"%h %s" --abbrev-commit ${{ github.event.before }}..${{ github.event.after }} || echo null))
+          echo ::set-output name=commit_log::$COMMIT_LOG
 
       - name: Send a message about the latest commit
         run: |
@@ -39,11 +43,23 @@ jobs:
           <b>was made at:</b> ${{ github.repository }}%0A\
           <b>by:</b> <u>${{ github.actor }}</u>%0A\
           <b>commits pushed:</b> ${{ steps.commit_info.outputs.commit_count }}%0A\
-          <b>commit message:</b>%0A\
-          ${{ github.event.head_commit.message }}%0A\
-          %0A\
-          <b>files changed:</b>%0A\
-          <pre>${{  steps.commit_info.outputs.files_changed }}</pre>%0A\
+          <b>commit log:</b>%0A\
+          <pre>${{ steps.commit_info.outputs.commit_log }}</pre>%0A\
           %0A\
           <b>url:</b> https://github.com/${{ github.repository }}/commit/${{ github.sha }}" \
           https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: [test]
+    if: github.ref == 'refs/heads/main'
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_email: ${{secrets.HEROKU_ACCOUNT_EMAIL}}
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "flaam-api"
