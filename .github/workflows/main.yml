@@ -16,7 +16,7 @@ jobs:
         id: commit_info
         run: |
           echo ::set-output name=commit_count::$(git rev-list --count ${{ github.event.before }}..${{ github.event.after }} || echo 0)
-          echo ::set-output name=commit_log::$(urlencode $(git log --pretty=format:"%h %s" --abbrev-commit ${{ github.event.before }}..${{ github.event.after }} || echo null))
+          echo ::set-output name=commit_log::$(git log --pretty=format:"%h %s" --abbrev-commit ${{ github.event.before }}..${{ github.event.after }} || echo null)
 
       - name: Send a message about the latest commit
         run: |
@@ -25,13 +25,13 @@ jobs:
           -d disable_notification=true \
           -d parse_mode=HTML \
           --data-urlencode "text=\
-          ↗️ <b>PUSH</b> \
-          <b>was made at:</b> ${{ github.repository }} \
-          <b>by:</b> <u>${{ github.actor }}</u> \
-          <b>commits pushed:</b> ${{ steps.commit_info.outputs.commit_count }} \
-          <b>commit log:</b>%0A\
-          <pre>${{ steps.commit_info.outputs.commit_log }}</pre> \
-          \
+          ↗️ <b>PUSH</b>
+          <b>was made at:</b> ${{ github.repository }}
+          <b>by:</b> <u>${{ github.actor }}</u>
+          <b>commits pushed:</b> ${{ steps.commit_info.outputs.commit_count }}
+          <b>commit log:</b>
+          <pre>${{ steps.commit_info.outputs.commit_log }}</pre>
+          
           <b>url:</b> https://github.com/${{ github.repository }}/commit/${{ github.sha }}" \
           https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
 
