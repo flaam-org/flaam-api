@@ -42,7 +42,8 @@ class UserAdmin(BaseUserAdmin):
                     "avatar",
                     "status",
                     "description",
-                    "favourite_tags",
+                    "favourite_tags" "saved_ideas",
+                    "saved_implementations",
                 )
             },
         ),

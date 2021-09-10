@@ -2,8 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.db import models
 
-from tags.models import Tag
-
 from .utils import avatar_path
 from .validators import UsernameValidator
 
@@ -39,7 +37,15 @@ class User(AbstractUser):
         help_text="A short description about the user",
     )
     favourite_tags = models.ManyToManyField(
-        Tag, blank=True, related_name="user_favourite_tags"
+        "tags.Tag", blank=True, related_name="user_favourite_tags"
+    )
+    saved_ideas = models.ManyToManyField(
+        "ideas.Idea", blank=True, related_name="user_saved_ideas"
+    )
+    saved_implementations = models.ManyToManyField(
+        "implementations.Implementation",
+        blank=True,
+        related_name="user_saved_implementations",
     )
 
     def __str__(self) -> str:
