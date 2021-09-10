@@ -35,6 +35,7 @@ UserModel: User = get_user_model()
 class UserRegisterView(APIView):
     """Register a new user"""
 
+    authentication_classes = ()
     permission_classes = (AllowAny,)
 
     @swagger_auto_schema(
@@ -62,6 +63,7 @@ class UserRegisterView(APIView):
 class UserExistsView(APIView):
     """Query if given username or email already exists"""
 
+    authentication_classes = ()
     permission_classes = (AllowAny,)
 
     @swagger_auto_schema(
@@ -179,6 +181,7 @@ class PublicUserProfileView(APIView):
 class ResetPasswordTokenView(APIView):
     """Obtain Reset Password Token"""
 
+    authentication_classes = ()
     permission_classes = (AllowAny,)
 
     @swagger_auto_schema(
@@ -210,6 +213,7 @@ class ResetPasswordTokenView(APIView):
 class ResetPasswordView(APIView):
     """Reset Password"""
 
+    authentication_classes = ()
     permission_classes = (AllowAny,)
 
     def get_object(self, token: str) -> PasswordResetToken:
