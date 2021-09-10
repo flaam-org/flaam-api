@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.db import models
 
-from tags.models import Tag
-
 
 class Idea(models.Model):
     title = models.CharField(max_length=255)
@@ -10,7 +8,7 @@ class Idea(models.Model):
     description = models.TextField(max_length=500)
     body = models.TextField()
     # TODO: milestones field
-    tags = models.ManyToManyField(Tag, related_name="idea_tags")
+    tags = models.ManyToManyField("tags.Tag", related_name="idea_tags")
     draft = models.BooleanField(default=True)
     upvotes = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="idea_upvotes"

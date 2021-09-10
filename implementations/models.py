@@ -1,8 +1,6 @@
 from django.conf import settings
 from django.db import models
 
-from tags.models import Tag
-
 
 class Implementation(models.Model):
     name = models.CharField(max_length=255)
@@ -11,7 +9,7 @@ class Implementation(models.Model):
     body = models.TextField(blank=True)
     repo_url = models.URLField(blank=True)
     # TODO: milestones field
-    tags = models.ManyToManyField(Tag, related_name="implementation_tags")
+    tags = models.ManyToManyField("tags.Tag", related_name="implementation_tags")
     draft = models.BooleanField(default=True)
     upvotes = models.ManyToManyField(
         settings.AUTH_USER_MODEL, related_name="implementation_upvotes"
