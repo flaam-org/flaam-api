@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             name="name",
             field=models.CharField(
                 error_messages={"unique": "This Tag already exists."},
-                help_text="Tag name must be 1 to 50 characters long. \nIt may only contain lowercase alphabets, numbers and hyphens. \nIt shouldn't start or end with hyphens. \n It shouldn't contain consecutive hyphens",
+                help_text="Tag name must be 1 to 50 characters long. It may only contain lowercase alphabets, numbers and hyphens. It shouldn't start or end with hyphens. It shouldn't contain consecutive hyphens",
                 max_length=50,
                 unique=True,
                 validators=[tags.validators.TagNameValidator],
