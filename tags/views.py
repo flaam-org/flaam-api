@@ -1,9 +1,11 @@
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from flaam_api.utils import CustomLimitOffsetPagination
 
@@ -82,3 +84,45 @@ class TagListView(ListCreateAPIView):
     )
     def post(self, request: Request) -> Response:
         return super().post(request)
+
+
+class FavouriteTagView(APIView):
+    """
+    Add or remove a tag from the user's favourites list.
+    """
+
+    @swagger_auto_schema(
+        tags=("tags",),
+        operation_id="favourite_tag_add",
+        operation_summary="Add a tag to the user's favourites list",
+        responses={
+            200: "Success.",
+            401: "Unauthorized.",
+            404: "Not found.",
+        },
+    )
+    def post(self, request: Request, name: str) -> Response:
+        try:
+            tag = Tag.objects.get(name=name)
+            tag.user_favourite_tags.add(request.user)
+        except Tag.DoesNotExist:
+            raise NotFound("Tag not found.")
+        return Response(status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        tags=("tags",),
+        operation_id="favourite_tag_remove",
+        operation_summary="Remove a tag from the user's favourites list",
+        responses={
+            200: "Success.",
+            401: "Unauthorized.",
+            404: "Not found.",
+        },
+    )
+    def delete(self, request: Request, name: str) -> Response:
+        try:
+            tag = Tag.objects.get(name=name)
+            tag.user_favourite_tags.remove(request.user)
+        except Tag.DoesNotExist:
+            raise NotFound("Tag not found.")
+        return Response(status=status.HTTP_200_OK)
