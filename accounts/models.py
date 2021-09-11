@@ -36,16 +36,14 @@ class User(AbstractUser):
         null=True,
         help_text="A short description about the user",
     )
+    following = models.ManyToManyField(
+        "self", blank=True, related_name="users_following", symmetrical=False
+    )
     favourite_tags = models.ManyToManyField(
         "tags.Tag", blank=True, related_name="user_favourite_tags"
     )
     saved_ideas = models.ManyToManyField(
         "ideas.Idea", blank=True, related_name="user_saved_ideas"
-    )
-    saved_implementations = models.ManyToManyField(
-        "implementations.Implementation",
-        blank=True,
-        related_name="user_saved_implementations",
     )
 
     def __str__(self) -> str:
