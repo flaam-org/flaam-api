@@ -1,9 +1,10 @@
 from django.contrib import admin
+from djangoql.admin import DjangoQLSearchMixin
 
 from .models import Tag
 
 
-class TagAdmin(admin.ModelAdmin):
+class TagAdmin(DjangoQLSearchMixin, admin.ModelAdmin):
     list_display = ("id", "name", "created_at", "updated_at")
     search_fields = ("name", "description", "created_by")
     readonly_fields = (

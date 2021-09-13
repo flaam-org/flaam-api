@@ -1,10 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from djangoql.admin import DjangoQLSearchMixin
 
 from .models import PasswordResetToken, User
 
 
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(DjangoQLSearchMixin, BaseUserAdmin):
     list_display = (
         "id",
         "username",
