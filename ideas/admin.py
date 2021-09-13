@@ -1,7 +1,19 @@
 from django.contrib import admin
+from django.http import request
 from djangoql.admin import DjangoQLSearchMixin
 
-from .models import Idea
+from .models import Idea, Milestone
+
+
+class MilestoneAdmin(admin.ModelAdmin):
+    ...
+
+
+class MileStoneInline(admin.TabularInline):
+    model = Milestone
+    show_change_link = True
+    extra = 1
+    max_num = 20
 
 
 class IdeaAdmin(DjangoQLSearchMixin, admin.ModelAdmin):
@@ -10,6 +22,7 @@ class IdeaAdmin(DjangoQLSearchMixin, admin.ModelAdmin):
     list_display_links = list_display
     list_filter = ("created_at", "updated_at", "draft")
     filter_horizontal = ("tags", "views", "upvotes", "downvotes")
+    inlines = (MileStoneInline,)
     search_fields = (
         "title",
         "description",
@@ -20,7 +33,7 @@ class IdeaAdmin(DjangoQLSearchMixin, admin.ModelAdmin):
     ordering = ("-created_at",)
     fieldsets = (
         (
-            "General",
+            None,
             {
                 "fields": (
                     "id",
@@ -30,9 +43,6 @@ class IdeaAdmin(DjangoQLSearchMixin, admin.ModelAdmin):
                     "description",
                     "body",
                     "tags",
-                    "views",
-                    "upvotes",
-                    "downvotes",
                 )
             },
         ),
@@ -40,6 +50,9 @@ class IdeaAdmin(DjangoQLSearchMixin, admin.ModelAdmin):
             "Metadata",
             {
                 "fields": (
+                    "views",
+                    "upvotes",
+                    "downvotes",
                     "created_at",
                     "updated_at",
                 )
@@ -49,3 +62,4 @@ class IdeaAdmin(DjangoQLSearchMixin, admin.ModelAdmin):
 
 
 admin.site.register(Idea, IdeaAdmin)
+admin.site.register(Milestone, MilestoneAdmin)
