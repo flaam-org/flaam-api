@@ -7,7 +7,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from flaam_api.utils import CustomLimitOffsetPagination
+from flaam_api.utils.paginations import CustomLimitOffsetPagination
 
 from .models import Tag
 from .serializers import TagDetailSerializer, TagSerializer

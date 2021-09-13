@@ -155,12 +155,12 @@ STATIC_ROOT_DIR = "static/"
 AUTH_USER_MODEL = "accounts.User"
 
 REST_FRAMEWORK = {
-    "EXCEPTION_HANDLER": "flaam_api.exceptions.exception_handler",
+    "EXCEPTION_HANDLER": "flaam_api.utils.exceptions.exception_handler",
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_PAGINATION_CLASS": "flaam_api.utils.CustomLimitOffsetPagination",
+    "DEFAULT_PAGINATION_CLASS": "flaam_api.utils.paginations.CustomLimitOffsetPagination",
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
