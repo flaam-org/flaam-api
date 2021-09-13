@@ -13,6 +13,13 @@ class UserAdmin(BaseUserAdmin):
         "last_name",
         "is_staff",
     )
+    list_display_links = list_display
+    filter_horizontal = (
+        *BaseUserAdmin.filter_horizontal,
+        "following",
+        "favourite_tags",
+        "saved_ideas",
+    )
     add_fieldsets = (
         (
             None,
