@@ -11,13 +11,13 @@ class Discussion(models.Model):
     tags = models.ManyToManyField(Tag, related_name="discussion_tags")
     draft = models.BooleanField(default=True)
     upvotes = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="discussion_upvotes"
+        settings.AUTH_USER_MODEL, blank=True, related_name="upvoted_discussions"
     )
     downvotes = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="discussion_downvotes"
+        settings.AUTH_USER_MODEL, blank=True, related_name="downvoted_discussions"
     )
     views = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="discussion_views"
+        settings.AUTH_USER_MODEL, blank=True, related_name="viewed_discussions"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -28,7 +28,7 @@ class DiscussionComment(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     body = models.TextField(max_length=500)
     upvotes = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="discussion_comment_upvotes"
+        settings.AUTH_USER_MODEL, related_name="upvoted_discussion_comments"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
