@@ -60,6 +60,12 @@ class IdeaAdmin(DjangoQLSearchMixin, admin.ModelAdmin):
         ),
     )
 
+    # to filter out duplicate results
+    # https://github.com/ivelum/djangoql/issues/80
+    def get_search_results(self, request, queryset, search_term):
+        qs, _ = super().get_search_results(request, queryset, search_term)
+        return qs, True
+
 
 admin.site.register(Idea, IdeaAdmin)
 admin.site.register(Milestone, MilestoneAdmin)
