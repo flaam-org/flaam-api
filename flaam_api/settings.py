@@ -14,6 +14,9 @@ from datetime import timedelta
 from os import getenv
 from pathlib import Path
 
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -29,6 +32,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+
+sentry_sdk.init(
+    dsn=getenv("SENTRY_DSN", ""),
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=1.0,
+    send_default_pii=True,
+)
 
 # Application definition
 
