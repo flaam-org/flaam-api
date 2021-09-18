@@ -16,7 +16,6 @@ from .serializers import TagDetailSerializer, TagSerializer
 
 class TagDetailView(RetrieveAPIView):
     serializer_class = TagDetailSerializer
-    lookup_field = "name"
     queryset = Tag.objects.all()
 
     @swagger_auto_schema(
@@ -28,8 +27,8 @@ class TagDetailView(RetrieveAPIView):
             404: "Not found.",
         },
     )
-    def get(self, request: Request, name: str) -> Response:
-        return super().get(request, name)
+    def get(self, request: Request, pk: int) -> Response:
+        return super().get(request, pk)
 
 
 class TagListView(ListCreateAPIView):
@@ -101,9 +100,9 @@ class FavouriteTagView(APIView):
             404: "Not found.",
         },
     )
-    def post(self, request: Request, name: str) -> Response:
+    def post(self, request: Request, pk: int) -> Response:
         try:
-            tag = Tag.objects.get(name=name)
+            tag = Tag.objects.get(id=pk)
             tag.user_favourite_tags.add(request.user)
         except Tag.DoesNotExist:
             raise NotFound("Tag not found.")
@@ -119,9 +118,9 @@ class FavouriteTagView(APIView):
             404: "Not found.",
         },
     )
-    def delete(self, request: Request, name: str) -> Response:
+    def delete(self, request: Request, pk: int) -> Response:
         try:
-            tag = Tag.objects.get(name=name)
+            tag = Tag.objects.get(id=pk)
             tag.user_favourite_tags.remove(request.user)
         except Tag.DoesNotExist:
             raise NotFound("Tag not found.")
