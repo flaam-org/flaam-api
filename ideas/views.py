@@ -2,7 +2,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.exceptions import APIException, ValidationError
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -14,7 +14,7 @@ from .models import Idea
 from .serializers import IdeaSerializer, MilestoneSerializer
 
 
-class IdeaDetailView(RetrieveUpdateDestroyAPIView):
+class IdeaDetailView(RetrieveAPIView):
     """
     Retrieve a single idea.
     """
@@ -39,7 +39,7 @@ class IdeaDetailView(RetrieveUpdateDestroyAPIView):
 
     @swagger_auto_schema(
         tags=("ideas",),
-        operation_summary="Get idea details",
+        operation_summary="Update idea details",
         request_body=IdeaSerializer,
         responses={
             200: IdeaSerializer,
@@ -50,6 +50,16 @@ class IdeaDetailView(RetrieveUpdateDestroyAPIView):
     def put(self, request: Request, pk: int, *args, **kwargs) -> Response:
         return super().put(request, pk, *args, **kwargs)
 
+    @swagger_auto_schema(
+        tags=("ideas",),
+        operation_summary="Delete idea",
+        request_body=IdeaSerializer,
+        responses={
+            200: IdeaSerializer,
+            401: "Unauthorized.",
+            404: "Not found.",
+        },
+    )
     def delete(self, request, *args, **kwargs):
         raise APIException("Not Implemented")
 
@@ -68,7 +78,7 @@ class IdeaListView(ListCreateAPIView):
 
     @swagger_auto_schema(
         tags=("ideas",),
-        operation_summary="Get idea details",
+        operation_summary="Get ideas",
         responses={
             200: IdeaSerializer,
             401: "Unauthorized.",
@@ -80,7 +90,7 @@ class IdeaListView(ListCreateAPIView):
 
     @swagger_auto_schema(
         tags=("ideas",),
-        operation_summary="Get idea details",
+        operation_summary="Create new Idea",
         request_body=IdeaSerializer,
         responses={
             200: IdeaSerializer,
