@@ -6,6 +6,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.contrib.postgres.search import SearchVector
 
 from flaam_api.utils.paginations import CustomLimitOffsetPagination
 
@@ -41,9 +42,8 @@ class TagListView(ListCreateAPIView):
         tag_ids = self.request.query_params.get("ids", None)
         tags = Tag.objects.all()
         if tag_name:
-            # TODO: improve search
-            # https://docs.djangoproject.com/en/3.2/ref/contrib/postgres/search/
-            tags = tags.filter(name__search=tag_name)
+            vector = SearchVector("name")  # + SearchVector("description")
+            tags = tags.annotate(search=vector).filter(search__icontains=tag_name)
         elif tag_ids:
             tags = tags.filter(id__in=tag_ids.split(","))
         return tags
