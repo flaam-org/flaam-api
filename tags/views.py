@@ -1,3 +1,4 @@
+from django.contrib.postgres.search import SearchVector
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -6,7 +7,6 @@ from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.postgres.search import SearchVector
 
 from flaam_api.utils.paginations import CustomLimitOffsetPagination
 
