@@ -28,7 +28,6 @@ class IdeaDetailView(RetrieveUpdateDestroyAPIView):
     @swagger_auto_schema(
         tags=("ideas",),
         operation_summary="Get idea details",
-        request_body=IdeaSerializer,
         responses={
             200: IdeaSerializer,
             401: "Unauthorized.",
@@ -70,7 +69,6 @@ class IdeaListView(ListCreateAPIView):
     @swagger_auto_schema(
         tags=("ideas",),
         operation_summary="Get idea details",
-        request_body=IdeaSerializer,
         responses={
             200: IdeaSerializer,
             401: "Unauthorized.",
