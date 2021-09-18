@@ -70,6 +70,7 @@ class IdeaSerializer(serializers.ModelSerializer):
             "owner",
             "description",
             "body",
+            "tags",
             "vote",
             "upvotes_count",
             "downvotes_count",
