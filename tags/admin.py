@@ -6,7 +6,7 @@ from .models import Tag
 
 class TagAdmin(DjangoQLSearchMixin, admin.ModelAdmin):
     list_display = ("id", "name", "created_at", "updated_at")
-    search_fields = ("name", "description", "created_by")
+    search_fields = ("name", "description")
     readonly_fields = (
         "id",
         "created_at",
