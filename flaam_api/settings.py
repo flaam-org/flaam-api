@@ -158,6 +158,7 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "flaam_api.utils.exceptions.exception_handler",
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "flaam_api.utils.paginations.CustomLimitOffsetPagination",

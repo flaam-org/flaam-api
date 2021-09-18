@@ -58,6 +58,7 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns.extend(
         [
+            path("api-auth/", include("rest_framework.urls")),
             # debug toolbar
             path(
                 "__debug__/",
