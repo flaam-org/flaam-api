@@ -29,7 +29,7 @@ class MilestoneListSerializer(serializers.ListSerializer):
 class MilestoneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Milestone
-        fields = ("id", "title", "idea", "created_at", "updated_at")
+        fields = ("id", "title", "created_at", "updated_at")
         read_only_fields = ("id", "created_at", "updated_at")
         list_serializer_class = MilestoneListSerializer
 
@@ -71,6 +71,7 @@ class IdeaSerializer(serializers.ModelSerializer):
             "description",
             "body",
             "tags",
+            "draft",
             "vote",
             "upvotes_count",
             "downvotes_count",
@@ -78,4 +79,4 @@ class IdeaSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
-        read_only_fields = ("id", "created_at", "updated_at")
+        read_only_fields = ("id", "owner", "created_at", "updated_at")
