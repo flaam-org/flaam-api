@@ -32,7 +32,11 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "last_login", "date_joined")
 
     def create(self, validated_data):
-        return UserModel.objects.create_user(**validated_data)
+        favourite_tags = validated_data.pop("favourite_tags", None)
+        user = UserModel.objects.create_user(**validated_data)
+        if favourite_tags:
+            user.favourite_tags.set(favourite_tags)
+        return user
 
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)
