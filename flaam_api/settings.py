@@ -36,7 +36,7 @@ ALLOWED_HOSTS = []
 sentry_sdk.init(
     dsn=getenv("SENTRY_DSN", ""),
     integrations=[DjangoIntegration()],
-    environment=getenv("SENTRY_ENV", "production"),
+    environment=getenv("SENTRY_ENV", "development"),
     traces_sample_rate=1.0,
     send_default_pii=True,
 )
