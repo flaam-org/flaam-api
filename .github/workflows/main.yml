@@ -15,7 +15,7 @@ jobs:
         id: commit_info
         run: |
           echo ::set-output name=commit_count::$(git rev-list --count ${{ github.event.before }}..${{ github.event.after }} || echo 0)
-          COMMIT_LOG=$(git log --pretty=format:" * %s" --abbrev-commit ${{ github.event.before }}..${{ github.event.after }} || echo null)
+          COMMIT_LOG=$(git log --pretty=format:" - %s" --abbrev-commit ${{ github.event.before }}..${{ github.event.after }} || echo null)
           COMMIT_LOG="${COMMIT_LOG//'%'/'%25'}"
           COMMIT_LOG="${COMMIT_LOG//$'\n'/'%0A'}"
           COMMIT_LOG="${COMMIT_LOG//$'\r'/'%0D'}"

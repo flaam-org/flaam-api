@@ -48,6 +48,7 @@ class IdeaDetailView(RetrieveAPIView):
         },
     )
     def put(self, request: Request, pk: int, *args, **kwargs) -> Response:
+        instance = self.get_object()
         return super().put(request, pk, *args, **kwargs)
 
     @swagger_auto_schema(
@@ -112,6 +113,7 @@ class IdeaListView(ListCreateAPIView):
             if milestone_serializer.is_valid():
                 milestone_serializer.save()
             else:
+                print(milestone_serializer.data)
                 # idea.delete()
                 raise ValidationError(serializer.errors)
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
