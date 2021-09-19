@@ -26,7 +26,7 @@ class User(AbstractUser):
         unique=True,
         verbose_name="email address",
     )
-    avatar = models.ImageField(upload_to=avatar_path, blank=True, null=True)
+    avatar = models.URLField(blank=True, null=True)
     status = models.CharField(
         max_length=20, blank=True, null=True, help_text="A short status message"
     )
