@@ -1,6 +1,7 @@
 import re
 
 from django.core import validators
+from django.core.exceptions import ValidationError
 from django.utils.deconstruct import deconstructible
 from django.utils.translation import gettext_lazy as _
 
@@ -25,3 +26,11 @@ class PasswordValidator(validators.RegexValidator):
         "one lowercase letter, one number and one special character."
     )
     flags = 0
+
+
+def avatar_validator(value):
+    if not value.startswith("https://avatars.dicebear.com/api/"):
+        raise ValidationError(
+            _("Enter a valid DiceBear avatar url"),
+            "invalid",
+        )

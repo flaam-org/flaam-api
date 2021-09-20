@@ -2,8 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.db import models
 
-from .utils import avatar_path
-from .validators import UsernameValidator
+from .validators import UsernameValidator, avatar_validator
 
 
 class User(AbstractUser):
@@ -26,7 +25,9 @@ class User(AbstractUser):
         unique=True,
         verbose_name="email address",
     )
-    avatar = models.URLField(blank=True, null=True)
+    avatar = models.CharField(
+        max_length=2048, blank=True, null=True, validators=[avatar_validator]
+    )
     status = models.CharField(
         max_length=20, blank=True, null=True, help_text="A short status message"
     )
