@@ -50,6 +50,11 @@ class User(AbstractUser):
     def __str__(self) -> str:
         return self.username
 
+    def save(self, *args, **kwargs):
+        if not self.avatar:
+            self.avatar = f"https://avatars.dicebear.com/api/identicon/{self.email}.svg"
+        super().save(*args, **kwargs)
+
 
 class PasswordResetToken(models.Model, PasswordResetTokenGenerator):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

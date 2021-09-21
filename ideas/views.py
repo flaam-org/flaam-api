@@ -113,7 +113,6 @@ class IdeaListView(ListCreateAPIView):
             if milestone_serializer.is_valid():
                 milestone_serializer.save()
             else:
-                print(milestone_serializer.data)
                 # idea.delete()
                 raise ValidationError(serializer.errors)
         return Response(data=serializer.data, status=status.HTTP_201_CREATED)
