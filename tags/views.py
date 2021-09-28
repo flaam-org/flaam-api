@@ -34,7 +34,7 @@ class TagDetailView(RetrieveAPIView):
 class TagListView(ListCreateAPIView):
 
     pagination_class = CustomLimitOffsetPagination
-    serializer_class = TagSerializer
+    serializer_class = TagDetailSerializer
 
     def get_queryset(self):
         tag_name = self.request.query_params.get("name", None)
@@ -65,7 +65,7 @@ class TagListView(ListCreateAPIView):
             ),
         ),
         responses={
-            200: TagSerializer,
+            200: TagDetailSerializer,
             401: "Unauthorized.",
         },
     )

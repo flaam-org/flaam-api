@@ -4,7 +4,14 @@ from django.db import models
 
 class Implementation(models.Model):
     title = models.CharField(max_length=255)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="implementations",
+    )
+    idea = models.ForeignKey(
+        "ideas.Idea", on_delete=models.CASCADE, related_name="implementations"
+    )
     description = models.TextField(max_length=500, blank=True)
     body = models.TextField(blank=True)
     repo_url = models.URLField(blank=True)
