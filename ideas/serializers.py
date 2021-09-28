@@ -105,7 +105,7 @@ class IdeaSerializer(serializers.ModelSerializer):
             "tags",
             "draft",
             "viewed",
-            "views",
+            "view_count",
             "vote",
             "implementations_count",
             "upvotes_count",
