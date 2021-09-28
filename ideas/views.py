@@ -35,6 +35,7 @@ class IdeaDetailView(RetrieveAPIView):
         },
     )
     def get(self, request: Request, pk: int, *args, **kwargs) -> Response:
+        self.get_object().views.add(request.user)
         return super().get(request, pk, *args, **kwargs)
 
     @swagger_auto_schema(
