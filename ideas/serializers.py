@@ -1,3 +1,4 @@
+from accounts import views
 from tags.serializers import TagSerializer
 from rest_framework import serializers
 
@@ -39,6 +40,8 @@ class MilestoneSerializer(serializers.ModelSerializer):
 class IdeaSerializer(serializers.ModelSerializer):
     owner_avatar = serializers.SerializerMethodField()
     owner_username = serializers.SerializerMethodField()
+    view_count = serializers.SerializerMethodField()
+    viewed = serializers.SerializerMethodField()
     implementations_count = serializers.SerializerMethodField()
     upvotes_count = serializers.SerializerMethodField()
     downvotes_count = serializers.SerializerMethodField()
@@ -50,6 +53,15 @@ class IdeaSerializer(serializers.ModelSerializer):
 
     def get_owner_username(self, obj):
         return obj.owner.username
+
+    def get_view_count(self, obj):
+        return obj.views.count()
+
+    def get_viewed(self, obj):
+        request = self.context.get("request")
+        if request is not None:
+            return obj.views.filter(pk=request.user.pk).exists()
+        return False
 
     def get_implementations_count(self, obj):
         return obj.implementations.count()
@@ -92,6 +104,8 @@ class IdeaSerializer(serializers.ModelSerializer):
             "body",
             "tags",
             "draft",
+            "viewed",
+            "views",
             "vote",
             "implementations_count",
             "upvotes_count",
