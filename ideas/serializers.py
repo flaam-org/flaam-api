@@ -35,11 +35,14 @@ class MilestoneSerializer(serializers.ModelSerializer):
 
 
 class IdeaSerializer(serializers.ModelSerializer):
-
+    implementations_count = serializers.SerializerMethodField()
     upvotes_count = serializers.SerializerMethodField()
     downvotes_count = serializers.SerializerMethodField()
     vote = serializers.SerializerMethodField()
     milestones = MilestoneSerializer(read_only=True, many=True)
+
+    def get_implementations_count(self, obj):
+        return obj.implementations.count()
 
     def get_upvotes_count(self, obj):
         return obj.upvotes.count()
