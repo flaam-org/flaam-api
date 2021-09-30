@@ -1,8 +1,8 @@
 from django.contrib.postgres.search import SearchVector
+from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from flaam_api.utils.paginations import CustomLimitOffsetPagination
 
 from .models import Tag
-from .serializers import TagDetailSerializer, TagSerializer
+from .serializers import TagDetailSerializer
 
 
 class TagDetailView(RetrieveAPIView):
@@ -101,11 +101,8 @@ class FavouriteTagView(APIView):
         },
     )
     def post(self, request: Request, pk: int) -> Response:
-        try:
-            tag = Tag.objects.get(id=pk)
-            tag.user_favourite_tags.add(request.user)
-        except Tag.DoesNotExist:
-            raise NotFound("Tag not found.")
+        tag = get_object_or_404(Tag, pk=pk)
+        tag.favorited_by.add(request.user)
         return Response(status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -119,9 +116,6 @@ class FavouriteTagView(APIView):
         },
     )
     def delete(self, request: Request, pk: int) -> Response:
-        try:
-            tag = Tag.objects.get(id=pk)
-            tag.user_favourite_tags.remove(request.user)
-        except Tag.DoesNotExist:
-            raise NotFound("Tag not found.")
+        tag = get_object_or_404(Tag, id=pk)
+        tag.favorited_by.remove(request.user)
         return Response(status=status.HTTP_200_OK)
