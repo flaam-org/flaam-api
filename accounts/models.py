@@ -43,8 +43,8 @@ class User(AbstractUser):
     favourite_tags = models.ManyToManyField(
         "tags.Tag", blank=True, related_name="favorited_by"
     )
-    saved_ideas = models.ManyToManyField(
-        "ideas.Idea", blank=True, related_name="saved_by"
+    bookmarked_ideas = models.ManyToManyField(
+        "ideas.Idea", blank=True, related_name="bookmarked_by"
     )
 
     def __str__(self) -> str:

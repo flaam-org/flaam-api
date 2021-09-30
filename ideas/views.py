@@ -1,4 +1,4 @@
-from drf_yasg import openapi
+from django.shortcuts import get_object_or_404
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.exceptions import APIException, ValidationError
@@ -6,6 +6,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from flaam_api.utils.paginations import CustomLimitOffsetPagination
 from flaam_api.utils.permissions import IsOwnerOrReadOnly
@@ -137,3 +138,41 @@ class IdeaListView(ListCreateAPIView):
         return Response(
             data=self.get_serializer(idea).data, status=status.HTTP_201_CREATED
         )
+
+
+class BookmarkIdeaView(APIView):
+    """
+    Bookmark an idea.
+    """
+
+    permission_classes = (IsAuthenticated,)
+
+    @swagger_auto_schema(
+        tags=("ideas",),
+        operation_id="bookmark_idea_add",
+        operation_summary="Add an idea to users bookmark",
+        responses={
+            200: "Success.",
+            401: "Unauthorized.",
+            404: "Not found.",
+        },
+    )
+    def post(self, request: Request, pk: int, *args, **kwargs) -> Response:
+        idea = get_object_or_404(Idea, pk=pk)
+        idea.bookmarked_by.add(request.user)
+        return Response(status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        tags=("ideas",),
+        operation_id="bookmark_idea_remove",
+        operation_summary="Remove an idea from users bookmark",
+        responses={
+            200: "Success.",
+            401: "Unauthorized.",
+            404: "Not found.",
+        },
+    )
+    def delete(self, request: Request, pk: int, *args, **kwargs) -> Response:
+        idea = get_object_or_404(Idea, pk=pk)
+        idea.bookmarked_by.remove(request.user)
+        return Response(status=status.HTTP_200_OK)

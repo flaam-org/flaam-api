@@ -19,7 +19,7 @@ class UserAdmin(DjangoQLSearchMixin, BaseUserAdmin):
         *BaseUserAdmin.filter_horizontal,
         "following",
         "favourite_tags",
-        "saved_ideas",
+        "bookmarked_ideas",
     )
     add_fieldsets = (
         (
@@ -52,7 +52,7 @@ class UserAdmin(DjangoQLSearchMixin, BaseUserAdmin):
                     "description",
                     "following",
                     "favourite_tags",
-                    "saved_ideas",
+                    "bookmarked_ideas",
                 )
             },
         ),

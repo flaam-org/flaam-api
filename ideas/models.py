@@ -4,7 +4,9 @@ from django.db import models
 
 class Idea(models.Model):
     title = models.CharField(max_length=255)
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="ideas"
+    )
     description = models.TextField(max_length=500, blank=True)
     body = models.TextField(blank=True)
     tags = models.ManyToManyField("tags.Tag", related_name="idea_tags")

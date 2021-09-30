@@ -1,6 +1,7 @@
+from rest_framework import serializers
+
 from accounts import views
 from tags.serializers import TagSerializer
-from rest_framework import serializers
 
 from .models import Idea, Milestone
 

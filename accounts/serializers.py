@@ -24,7 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
             "date_joined",
             "following",
             "favourite_tags",
-            "saved_ideas",
+            "bookmarked_ideas",
         )
         extra_kwargs = {
             "password": {"write_only": True},
@@ -62,7 +62,7 @@ class PublicUserSerializer(serializers.ModelSerializer):
             "date_joined",
             "following",
             "favourite_tags",
-            "saved_ideas",
+            "bookmarked_ideas",
         )
 
 
