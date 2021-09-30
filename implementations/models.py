@@ -38,8 +38,14 @@ class Implementation(models.Model):
 
 
 class ImplementationComment(models.Model):
-    implementation = models.ForeignKey(Implementation, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    implementation = models.ForeignKey(
+        Implementation, on_delete=models.CASCADE, related_name="comments"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="implementation_comments",
+    )
     body = models.TextField(max_length=500)
     upvotes = models.ManyToManyField(
         settings.AUTH_USER_MODEL,
