@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from django.contrib.postgres.search import SearchVector
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
@@ -12,6 +13,8 @@ from flaam_api.utils.paginations import CustomLimitOffsetPagination
 
 from .models import Tag
 from .serializers import TagDetailSerializer
+
+UserModel = get_user_model()
 
 
 class TagDetailView(RetrieveAPIView):
@@ -37,20 +40,33 @@ class TagListView(ListCreateAPIView):
     serializer_class = TagDetailSerializer
 
     def get_queryset(self):
-        tag_name = self.request.query_params.get("name", None)
-        tag_ids = self.request.query_params.get("ids", None)
         tags = Tag.objects.all()
+
+        user_id = self.request.query_params.get("user_id", None)
+        if user_id:
+            user = get_object_or_404(UserModel, pk=user_id)
+            return user.favourite_tags.all()
+
+        tag_ids = self.request.query_params.get("ids", None)
+        if tag_ids:
+            return tags.filter(id__in=tag_ids.split(","))
+
+        tag_name = self.request.query_params.get("name", None)
         if tag_name:
             vector = SearchVector("name")  # + SearchVector("description")
             tags = tags.annotate(search=vector).filter(search__icontains=tag_name)
-        elif tag_ids:
-            tags = tags.filter(id__in=tag_ids.split(","))
         return tags
 
     @swagger_auto_schema(
         tags=("tags",),
         operation_summary="Get tags",
         manual_parameters=(
+            openapi.Parameter(
+                "user_id",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_INTEGER,
+                description="Get user's favourite tags",
+            ),
             openapi.Parameter(
                 "name",
                 in_=openapi.IN_QUERY,
@@ -67,6 +83,7 @@ class TagListView(ListCreateAPIView):
         responses={
             200: TagDetailSerializer,
             401: "Unauthorized.",
+            404: "Not Found.",
         },
     )
     def get(self, request: Request) -> Response:
