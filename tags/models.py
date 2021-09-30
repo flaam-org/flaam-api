@@ -7,7 +7,7 @@ class Tag(models.Model):
     name = models.CharField(
         max_length=50,
         unique=True,
-        validators=(TagNameValidator,),
+        validators=(TagNameValidator(),),
         help_text=(
             "Tag name must be 1 to 50 characters long. "
             "It may only contain lowercase alphabets, numbers and hyphens. "
