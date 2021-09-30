@@ -16,6 +16,8 @@ class Implementation(models.Model):
     body = models.TextField(blank=True)
     repo_url = models.URLField(blank=True)
     draft = models.BooleanField(default=True)
+    is_validated = models.BooleanField(default=False)
+    is_accepted = models.BooleanField(default=False)
     tags = models.ManyToManyField(
         "tags.Tag", blank=True, related_name="implementation_tags"
     )
@@ -36,12 +38,15 @@ class Implementation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self) -> str:
+        return f"IMPL{self.id}"
+
 
 class ImplementationComment(models.Model):
     implementation = models.ForeignKey(
         Implementation, on_delete=models.CASCADE, related_name="comments"
     )
-    user = models.ForeignKey(
+    owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name="implementation_comments",
@@ -54,3 +59,6 @@ class ImplementationComment(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"IMPLCOM{self.id}"
