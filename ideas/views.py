@@ -1,4 +1,6 @@
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.exceptions import APIException, ValidationError
@@ -13,6 +15,8 @@ from flaam_api.utils.permissions import IsOwnerOrReadOnly
 
 from .models import Idea
 from .serializers import IdeaSerializer, MilestoneSerializer
+
+UserModel = get_user_model()
 
 
 class IdeaDetailView(RetrieveAPIView):
@@ -91,13 +95,30 @@ class IdeaListView(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     pagination_class = CustomLimitOffsetPagination
     serializer_class = IdeaSerializer
-    queryset = Idea.objects.all().prefetch_related(
-        "milestones", "upvotes", "downvotes", "views"
-    )
+
+    def get_queryset(self):
+        ideas = Idea.objects.all().prefetch_related(
+            "milestones", "upvotes", "downvotes", "views"
+        )
+        owner_id = self.request.query_params.get("owner_id")
+        if owner_id:
+            user = get_object_or_404(UserModel, pk=owner_id)
+            return user.ideas.all().prefetch_related(
+                "milestones", "upvotes", "downvotes", "views"
+            )
+        return ideas
 
     @swagger_auto_schema(
         tags=("ideas",),
         operation_summary="Get ideas",
+        manual_parameters=(
+            openapi.Parameter(
+                "owner_id",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_INTEGER,
+                description="Get user's ideas",
+            ),
+        ),
         responses={
             200: IdeaSerializer,
             401: "Unauthorized.",
