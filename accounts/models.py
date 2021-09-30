@@ -16,7 +16,7 @@ class User(AbstractUser):
         ),
         max_length=32,
         unique=True,
-        validators=(UsernameValidator,),
+        validators=(UsernameValidator(),),
         verbose_name="username",
     )
     email = models.EmailField(
