@@ -46,6 +46,9 @@ class User(AbstractUser):
     bookmarked_ideas = models.ManyToManyField(
         "ideas.Idea", blank=True, related_name="bookmarked_by"
     )
+    bookmarked_implementations = models.ManyToManyField(
+        "implementations.Implementation", blank=True, related_name="bookmarked_by"
+    )
 
     def __str__(self) -> str:
         return self.username
