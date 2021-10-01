@@ -43,6 +43,7 @@ class IdeaSerializer(serializers.ModelSerializer):
     owner_username = serializers.SerializerMethodField()
     view_count = serializers.SerializerMethodField()
     viewed = serializers.SerializerMethodField()
+    bookmarked = serializers.SerializerMethodField()
     implementations_count = serializers.SerializerMethodField()
     upvotes_count = serializers.SerializerMethodField()
     downvotes_count = serializers.SerializerMethodField()
@@ -62,6 +63,12 @@ class IdeaSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         if request is not None:
             return obj.views.filter(pk=request.user.pk).exists()
+        return False
+
+    def get_bookmarked(self, obj):
+        request = self.context.get("request")
+        if request is not None:
+            return obj.bookmarked_by.filter(pk=request.user.pk).exists()
         return False
 
     def get_implementations_count(self, obj):
@@ -106,6 +113,7 @@ class IdeaSerializer(serializers.ModelSerializer):
             "tags",
             "draft",
             "viewed",
+            "bookmarked",
             "view_count",
             "vote",
             "implementations_count",
