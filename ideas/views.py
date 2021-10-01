@@ -97,46 +97,35 @@ class IdeaListView(ListCreateAPIView):
     serializer_class = IdeaSerializer
 
     def get_queryset(self):
+        prefetch_related_fields = (
+            "milestones",
+            "upvotes",
+            "downvotes",
+            "views",
+            "tags",
+            "implementations",
+        )
         ideas = (
             Idea.objects.all()
-            .prefetch_related(
-                "milestones",
-                "upvotes",
-                "downvotes",
-                "views",
-                "tags",
-                "implementations",
-            )
+            .prefetch_related(prefetch_related_fields)
             .select_related("owner")
         )
+
         owner_id = self.request.query_params.get("owner_id")
         if owner_id:
             user = get_object_or_404(UserModel, pk=owner_id)
             return (
                 user.ideas.all()
-                .prefetch_related(
-                    "milestones",
-                    "upvotes",
-                    "downvotes",
-                    "views",
-                    "tags",
-                    "implementations",
-                )
+                .prefetch_related(prefetch_related_fields)
                 .select_related("owner")
             )
+
         bookmarked_by = self.request.query_params.get("bookmarked_by")
         if bookmarked_by:
             user = get_object_or_404(UserModel, pk=bookmarked_by)
             return (
                 user.bookmarked_ideas.all()
-                .prefetch_related(
-                    "milestones",
-                    "upvotes",
-                    "downvotes",
-                    "views",
-                    "tags",
-                    "implementations",
-                )
+                .prefetch_related(prefetch_related_fields)
                 .select_related("owner")
             )
         return ideas
@@ -159,7 +148,7 @@ class IdeaListView(ListCreateAPIView):
             ),
         ),
         responses={
-            200: IdeaSerializer,
+            200: IdeaSerializer(many=True),
             401: "Unauthorized.",
             404: "Not found.",
         },
@@ -212,7 +201,7 @@ class BookmarkIdeaView(APIView):
         operation_id="bookmark_idea_add",
         operation_summary="Add an idea to users bookmark",
         responses={
-            200: "Success.",
+            204: "Success.",
             401: "Unauthorized.",
             404: "Not found.",
         },
@@ -220,14 +209,14 @@ class BookmarkIdeaView(APIView):
     def post(self, request: Request, pk: int, *args, **kwargs) -> Response:
         idea = get_object_or_404(Idea, pk=pk)
         idea.bookmarked_by.add(request.user)
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @swagger_auto_schema(
         tags=("ideas",),
         operation_id="bookmark_idea_remove",
         operation_summary="Remove an idea from users bookmark",
         responses={
-            200: "Success.",
+            204: "Success.",
             401: "Unauthorized.",
             404: "Not found.",
         },
@@ -235,4 +224,4 @@ class BookmarkIdeaView(APIView):
     def delete(self, request: Request, pk: int, *args, **kwargs) -> Response:
         idea = get_object_or_404(Idea, pk=pk)
         idea.bookmarked_by.remove(request.user)
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)

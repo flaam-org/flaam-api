@@ -81,7 +81,7 @@ class TagListView(ListCreateAPIView):
             ),
         ),
         responses={
-            200: TagDetailSerializer,
+            200: TagDetailSerializer(many=True),
             401: "Unauthorized.",
             404: "Not Found.",
         },
@@ -112,7 +112,7 @@ class FavouriteTagView(APIView):
         operation_id="favourite_tag_add",
         operation_summary="Add a tag to the user's favourites list",
         responses={
-            200: "Success.",
+            204: "Success.",
             401: "Unauthorized.",
             404: "Not found.",
         },
@@ -120,14 +120,14 @@ class FavouriteTagView(APIView):
     def post(self, request: Request, pk: int) -> Response:
         tag = get_object_or_404(Tag, pk=pk)
         tag.favorited_by.add(request.user)
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @swagger_auto_schema(
         tags=("tags",),
         operation_id="favourite_tag_remove",
         operation_summary="Remove a tag from the user's favourites list",
         responses={
-            200: "Success.",
+            204: "Success.",
             401: "Unauthorized.",
             404: "Not found.",
         },
@@ -135,4 +135,4 @@ class FavouriteTagView(APIView):
     def delete(self, request: Request, pk: int) -> Response:
         tag = get_object_or_404(Tag, id=pk)
         tag.favorited_by.remove(request.user)
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
