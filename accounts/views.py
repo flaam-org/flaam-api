@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.validators import EmailValidator
 from django.shortcuts import get_object_or_404
-from django.utils.timezone import datetime, timedelta
+from django.utils.timezone import datetime
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -44,8 +44,8 @@ class UserRegisterView(APIView):
         operation_summary="Register a new user",
         request_body=UserSerializer,
         responses={
-            status.HTTP_201_CREATED: TokenObtainPairResponseSerializer,
-            status.HTTP_400_BAD_REQUEST: "Bad request",
+            201: TokenObtainPairResponseSerializer,
+            400: "Bad request",
         },
     )
     def post(self, request: Request) -> Response:
@@ -84,8 +84,8 @@ class UserExistsView(APIView):
             ),
         ),
         responses={
-            status.HTTP_204_NO_CONTENT: "Username or email already exist",
-            status.HTTP_400_BAD_REQUEST: "Bad request",
+            204: "Username or email already exist",
+            400: "Bad request",
             status.HTTP_404_NOT_FOUND: "Username or email does not exist",
         },
     )
@@ -115,8 +115,8 @@ class UserProfileView(APIView):
         operation_id="accounts_user_profile_read",
         operation_summary="Get authenticated user's profile",
         responses={
-            status.HTTP_200_OK: UserSerializer,
-            status.HTTP_401_UNAUTHORIZED: "Unauthorized",
+            200: UserSerializer,
+            401: "Unauthorized",
         },
     )
     def get(self, request: Request) -> Response:
@@ -129,9 +129,9 @@ class UserProfileView(APIView):
         operation_summary="Update authenticated user's profile",
         request_body=UserSerializer,
         responses={
-            status.HTTP_200_OK: UserSerializer,
-            status.HTTP_400_BAD_REQUEST: "Bad request",
-            status.HTTP_401_UNAUTHORIZED: "Unauthorized",
+            200: UserSerializer,
+            400: "Bad request",
+            401: "Unauthorized",
         },
     )
     def put(self, request: Request) -> Response:
@@ -145,8 +145,8 @@ class UserProfileView(APIView):
         tags=("users",),
         operation_summary="Deactivate authenticated user's profile",
         responses={
-            status.HTTP_204_NO_CONTENT: "Accout deactivated successfully",
-            status.HTTP_401_UNAUTHORIZED: "Unauthorized",
+            204: "Accout deactivated successfully",
+            401: "Unauthorized",
         },
     )
     def delete(self, request: Request) -> Response:
@@ -166,8 +166,8 @@ class PublicUserProfileView(APIView):
         operation_id="accounts_user_public_profile_read",
         operation_summary="Get public user's profile",
         responses={
-            status.HTTP_200_OK: PublicUserSerializer,
-            status.HTTP_401_UNAUTHORIZED: "Unauthorized",
+            200: PublicUserSerializer,
+            401: "Unauthorized",
             status.HTTP_404_NOT_FOUND: "Not found.",
         },
     )
@@ -191,8 +191,8 @@ class ResetPasswordTokenView(APIView):
         operation_summary="Obtain a password reset token",
         request_body=ResetPasswordTokenSerializer,
         responses={
-            status.HTTP_204_NO_CONTENT: "",
-            status.HTTP_400_BAD_REQUEST: "Bad request",
+            204: "",
+            400: "Bad request",
         },
     )
     def post(self, request: Request) -> Response:
@@ -236,7 +236,7 @@ class ResetPasswordView(APIView):
         operation_id="accounts_password_reset_token_verify",
         operation_summary="validate password reset token",
         responses={
-            status.HTTP_200_OK: openapi.Response(
+            200: openapi.Response(
                 description="Valid reset token",
                 schema=openapi.Schema(
                     type=openapi.TYPE_OBJECT,
@@ -246,7 +246,7 @@ class ResetPasswordView(APIView):
                     },
                 ),
             ),
-            status.HTTP_400_BAD_REQUEST: "Invalid reset token",
+            400: "Invalid reset token",
         },
     )
     def get(self, request: Request, token) -> Response:
@@ -266,7 +266,7 @@ class ResetPasswordView(APIView):
         operation_id="accounts_password_reset",
         operation_summary="Reset user password",
         responses={
-            status.HTTP_204_NO_CONTENT: "",
+            204: "",
             status.HTTP_404_NOT_FOUND: "Invalid token",
         },
     )
@@ -292,9 +292,9 @@ class DecoratedTokenObtainPairView(TokenObtainPairView):
         security=[],
         operation_summary="Obtain token pair",
         responses={
-            status.HTTP_200_OK: TokenObtainPairResponseSerializer,
-            status.HTTP_400_BAD_REQUEST: "Bad request",
-            status.HTTP_401_UNAUTHORIZED: "Unauthorized",
+            200: TokenObtainPairResponseSerializer,
+            400: "Bad request",
+            401: "Unauthorized",
         },
     )
     def post(self, request, *args, **kwargs):
@@ -308,9 +308,9 @@ class DecoratedTokenRefreshView(TokenRefreshView):
         operation_id="accounts_login_refresh",
         operation_summary="Refresh access token",
         responses={
-            status.HTTP_200_OK: TokenRefreshResponseSerializer,
-            status.HTTP_400_BAD_REQUEST: "Bad request",
-            status.HTTP_401_UNAUTHORIZED: "Unauthorized",
+            200: TokenRefreshResponseSerializer,
+            400: "Bad request",
+            401: "Unauthorized",
         },
     )
     def post(self, request, *args, **kwargs):
@@ -324,9 +324,9 @@ class DecoratedTokenVerifyView(TokenVerifyView):
         operation_id="accounts_login_verify",
         operation_summary="Verify token",
         responses={
-            status.HTTP_200_OK: TokenVerifyResponseSerializer,
-            status.HTTP_400_BAD_REQUEST: "Bad request",
-            status.HTTP_401_UNAUTHORIZED: "Unauthorized",
+            200: TokenVerifyResponseSerializer,
+            400: "Bad request",
+            401: "Unauthorized",
         },
     )
     def post(self, request, *args, **kwargs):
