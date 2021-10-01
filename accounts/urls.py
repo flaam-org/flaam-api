@@ -18,7 +18,7 @@ urlpatterns = [
     path("login/refresh", DecoratedTokenRefreshView.as_view(), name="token_refresh"),
     path("login/verify", DecoratedTokenVerifyView.as_view(), name="token_verify"),
     # Users
-    path("user", UserRegisterView.as_view(), name="signup"),
+    path("users", UserRegisterView.as_view(), name="signup"),
     path("user/profile", UserProfileView.as_view(), name="user_profile"),
     path("user/<int:pk>", PublicUserProfileView.as_view(), name="user_public"),
     path("user/exists", UserExistsView.as_view(), name="user_exists"),
