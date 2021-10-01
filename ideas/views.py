@@ -97,14 +97,47 @@ class IdeaListView(ListCreateAPIView):
     serializer_class = IdeaSerializer
 
     def get_queryset(self):
-        ideas = Idea.objects.all().prefetch_related(
-            "milestones", "upvotes", "downvotes", "views"
+        ideas = (
+            Idea.objects.all()
+            .prefetch_related(
+                "milestones",
+                "upvotes",
+                "downvotes",
+                "views",
+                "tags",
+                "implementations",
+            )
+            .select_related("owner")
         )
         owner_id = self.request.query_params.get("owner_id")
         if owner_id:
             user = get_object_or_404(UserModel, pk=owner_id)
-            return user.ideas.all().prefetch_related(
-                "milestones", "upvotes", "downvotes", "views"
+            return (
+                user.ideas.all()
+                .prefetch_related(
+                    "milestones",
+                    "upvotes",
+                    "downvotes",
+                    "views",
+                    "tags",
+                    "implementations",
+                )
+                .select_related("owner")
+            )
+        bookmarked_by = self.request.query_params.get("bookmarked_by")
+        if bookmarked_by:
+            user = get_object_or_404(UserModel, pk=bookmarked_by)
+            return (
+                user.bookmarked_ideas.all()
+                .prefetch_related(
+                    "milestones",
+                    "upvotes",
+                    "downvotes",
+                    "views",
+                    "tags",
+                    "implementations",
+                )
+                .select_related("owner")
             )
         return ideas
 
@@ -117,6 +150,12 @@ class IdeaListView(ListCreateAPIView):
                 in_=openapi.IN_QUERY,
                 type=openapi.TYPE_INTEGER,
                 description="Get user's ideas",
+            ),
+            openapi.Parameter(
+                "bookmarked_by",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_INTEGER,
+                description="Get user's bookmarked ideas",
             ),
         ),
         responses={
