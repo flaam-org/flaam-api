@@ -42,9 +42,9 @@ class TagListView(ListCreateAPIView):
     def get_queryset(self):
         tags = Tag.objects.all()
 
-        user_id = self.request.query_params.get("user_id", None)
-        if user_id:
-            user = get_object_or_404(UserModel, pk=user_id)
+        favourited_by = self.request.query_params.get("favourited_by", None)
+        if favourited_by:
+            user = get_object_or_404(UserModel, pk=favourited_by)
             return user.favourite_tags.all()
 
         tag_ids = self.request.query_params.get("ids", None)
@@ -62,7 +62,7 @@ class TagListView(ListCreateAPIView):
         operation_summary="Get tags",
         manual_parameters=(
             openapi.Parameter(
-                "user_id",
+                "favourited_by",
                 in_=openapi.IN_QUERY,
                 type=openapi.TYPE_INTEGER,
                 description="Get user's favourite tags",
