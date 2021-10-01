@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -26,8 +27,23 @@ class IdeaDetailView(RetrieveAPIView):
 
     permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
     serializer_class = IdeaSerializer
-    queryset = Idea.objects.all().prefetch_related(
-        "milestones", "upvotes", "downvotes", "views"
+    queryset = (
+        Idea.objects.all()
+        .select_related("owner")
+        .prefetch_related(
+            "milestones",
+            "upvotes",
+            "downvotes",
+            "views",
+            "tags",
+            "implementations",
+        )
+        .annotate(
+            upvote_count=Count("upvotes"),
+            downvote_count=Count("downvotes"),
+            view_count=Count("views"),
+            implementation_count=Count("implementations"),
+        )
     )
 
     @swagger_auto_schema(
@@ -97,18 +113,23 @@ class IdeaListView(ListCreateAPIView):
     serializer_class = IdeaSerializer
 
     def get_queryset(self):
-        prefetch_related_fields = (
-            "milestones",
-            "upvotes",
-            "downvotes",
-            "views",
-            "tags",
-            "implementations",
-        )
         ideas = (
             Idea.objects.all()
-            .prefetch_related(prefetch_related_fields)
             .select_related("owner")
+            .prefetch_related(
+                "milestones",
+                "upvotes",
+                "downvotes",
+                "views",
+                "tags",
+                "implementations",
+            )
+            .annotate(
+                upvote_count=Count("upvotes"),
+                downvote_count=Count("downvotes"),
+                view_count=Count("views"),
+                implementation_count=Count("implementations"),
+            )
         )
 
         owner_id = self.request.query_params.get("owner_id")
@@ -116,8 +137,21 @@ class IdeaListView(ListCreateAPIView):
             user = get_object_or_404(UserModel, pk=owner_id)
             return (
                 user.ideas.all()
-                .prefetch_related(prefetch_related_fields)
                 .select_related("owner")
+                .prefetch_related(
+                    "milestones",
+                    "upvotes",
+                    "downvotes",
+                    "views",
+                    "tags",
+                    "implementations",
+                )
+                .annotate(
+                    upvote_count=Count("upvotes"),
+                    downvote_count=Count("downvotes"),
+                    view_count=Count("views"),
+                    implementation_count=Count("implementations"),
+                )
             )
 
         bookmarked_by = self.request.query_params.get("bookmarked_by")
@@ -125,8 +159,21 @@ class IdeaListView(ListCreateAPIView):
             user = get_object_or_404(UserModel, pk=bookmarked_by)
             return (
                 user.bookmarked_ideas.all()
-                .prefetch_related(prefetch_related_fields)
                 .select_related("owner")
+                .prefetch_related(
+                    "milestones",
+                    "upvotes",
+                    "downvotes",
+                    "views",
+                    "tags",
+                    "implementations",
+                )
+                .annotate(
+                    upvote_count=Count("upvotes"),
+                    downvote_count=Count("downvotes"),
+                    view_count=Count("views"),
+                    implementation_count=Count("implementations"),
+                )
             )
         return ideas
 
