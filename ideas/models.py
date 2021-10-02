@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 
@@ -9,6 +10,7 @@ class Idea(models.Model):
     )
     description = models.TextField(max_length=500, blank=True)
     body = models.TextField(blank=True)
+    milestones = ArrayField(models.CharField(max_length=255), default=list, size=10)
     tags = models.ManyToManyField("tags.Tag", related_name="idea_tags")
     draft = models.BooleanField(default=True)
     upvotes = models.ManyToManyField(
@@ -25,13 +27,3 @@ class Idea(models.Model):
 
     def __str__(self) -> str:
         return f"IDEA{self.id}"
-
-
-class Milestone(models.Model):
-    title = models.CharField(max_length=255)
-    idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name="milestones")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self) -> str:
-        return f"MS{self.id}"

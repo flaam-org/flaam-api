@@ -15,7 +15,7 @@ from flaam_api.utils.paginations import CustomLimitOffsetPagination
 from flaam_api.utils.permissions import IsOwnerOrReadOnly
 
 from .models import Idea
-from .serializers import IdeaSerializer, MilestoneSerializer
+from .serializers import IdeaSerializer
 
 UserModel = get_user_model()
 
@@ -76,17 +76,17 @@ class IdeaDetailView(RetrieveAPIView):
         )
         if serializer.is_valid(raise_exception=True):
             idea = serializer.save(owner=request.user)
-            milestones = request.data.get("milestones", [])
-            if milestones:
-                milestone_serializer = MilestoneSerializer(
-                    data=milestones,
-                    many=True,
-                    context={"idea": idea},
-                )
-                if milestone_serializer.is_valid():
-                    milestone_serializer.save()
-                else:
-                    raise ValidationError(serializer.errors)
+            # milestones = request.data.get("milestones", [])
+            # if milestones:
+            #     milestone_serializer = MilestoneSerializer(
+            #         data=milestones,
+            #         many=True,
+            #         context={"idea": idea},
+            #     )
+            #     if milestone_serializer.is_valid():
+            #         milestone_serializer.save()
+            #     else:
+            #         raise ValidationError(serializer.errors)
         return Response(data=self.get_serializer(idea).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -219,18 +219,18 @@ class IdeaListView(ListCreateAPIView):
         )
         if serializer.is_valid(raise_exception=True):
             idea = serializer.save(owner=request.user)
-            milestones = request.data.get("milestones", [])
-            if milestones:
-                milestone_serializer = MilestoneSerializer(
-                    data=milestones,
-                    many=True,
-                    context={"idea": idea},
-                )
-                if milestone_serializer.is_valid():
-                    milestone_serializer.save()
-                else:
-                    idea.delete()
-                    raise ValidationError(serializer.errors)
+            # milestones = request.data.get("milestones", [])
+            # if milestones:
+            #     milestone_serializer = MilestoneSerializer(
+            #         data=milestones,
+            #         many=True,
+            #         context={"idea": idea},
+            #     )
+            #     if milestone_serializer.is_valid():
+            #         milestone_serializer.save()
+            #     else:
+            #         idea.delete()
+            #         raise ValidationError(serializer.errors)
         return Response(
             data=self.get_serializer(idea).data, status=status.HTTP_201_CREATED
         )

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 
@@ -21,10 +22,8 @@ class Implementation(models.Model):
     tags = models.ManyToManyField(
         "tags.Tag", blank=True, related_name="implementation_tags"
     )
-    completed_milestones = models.ManyToManyField(
-        "ideas.Milestone",
-        blank=True,
-        related_name="completed_implementations",
+    completed_milestones = ArrayField(
+        models.PositiveSmallIntegerField(), default=list, size=10
     )
     upvotes = models.ManyToManyField(
         settings.AUTH_USER_MODEL, blank=True, related_name="upvoted_implementations"

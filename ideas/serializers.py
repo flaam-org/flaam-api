@@ -3,39 +3,7 @@ from rest_framework import serializers
 from accounts import views
 from tags.serializers import TagSerializer
 
-from .models import Idea, Milestone
-
-
-class MilestoneListSerializer(serializers.ListSerializer):
-    def create(self, validated_data):
-        try:
-            idea = self.context["idea"]
-            previous_milestones = idea.milestones.all()
-            new_milestones = []
-            milestones = []
-            for item in validated_data:
-                if "id" not in item:
-                    new_milestones.append(Milestone(idea=idea, title=item["title"]))
-                else:
-                    milestone = Milestone.objects.get(id=item["id"])
-                    milestone.title = item["title"]
-                    milestone.save()
-                    milestones.append(milestone)
-        except KeyError as e:
-            missing_key = e.args[0]
-            raise serializers.ValidationError(f"Milestone {missing_key} not specified")
-
-        return Milestone.objects.bulk_create(new_milestones) + milestones
-
-
-class MilestoneSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(max_length=255, required=False)
-
-    class Meta:
-        model = Milestone
-        fields = ("id", "title", "created_at", "updated_at")
-        read_only_fields = ("id", "created_at", "updated_at")
-        list_serializer_class = MilestoneListSerializer
+from .models import Idea
 
 
 class IdeaSerializer(serializers.ModelSerializer):
@@ -48,7 +16,6 @@ class IdeaSerializer(serializers.ModelSerializer):
     viewed = serializers.SerializerMethodField()
     bookmarked = serializers.SerializerMethodField()
     vote = serializers.SerializerMethodField()
-    milestones = MilestoneSerializer(many=True, required=False)
 
     def get_owner_avatar(self, obj):
         return obj.owner.avatar
