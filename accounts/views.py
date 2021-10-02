@@ -129,9 +129,6 @@ class UserProfileView(APIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request: Request) -> Response:
-        raise MethodNotAllowed("PUT")
-
     @swagger_auto_schema(
         tags=("users",),
         operation_summary="Update authenticated user's profile",
