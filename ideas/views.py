@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.exceptions import APIException, ValidationError
+from rest_framework.exceptions import APIException, ParseError, ValidationError
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -175,6 +175,49 @@ class IdeaListView(ListCreateAPIView):
     )
     def post(self, request: Request, *args, **kwargs) -> Response:
         return super().post(request, *args, **kwargs)
+
+
+class VoteIdeaView(APIView):
+    """Vote on an idea."""
+
+    permission_classes = (IsAuthenticated,)
+
+    @swagger_auto_schema(
+        tags=("ideas",),
+        operation_summary="Vote on an idea",
+        manual_parameters=(
+            openapi.Parameter(
+                "value",
+                in_=openapi.IN_QUERY,
+                type=openapi.TYPE_INTEGER,
+                description="Vote, possible values: [-1, 0, 1]",
+            ),
+        ),
+        responses={
+            204: "Success.",
+            400: "Bad request.",
+            401: "Unauthorized.",
+            404: "Not found.",
+        },
+    )
+    def post(self, request: Request, pk: int) -> Response:
+
+        idea = get_object_or_404(Idea, pk=pk)
+
+        value = request.query_params.get("value")
+        if value == "0":
+            idea.downvotes.remove(request.user)
+            idea.upvotes.remove(request.user)
+        elif value == "1":
+            idea.upvotes.add(request.user)
+            idea.downvotes.remove(request.user)
+        elif value == "-1":
+            idea.downvotes.add(request.user)
+            idea.upvotes.remove(request.user)
+        else:
+            raise ParseError("Invalid vote value.")
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class BookmarkIdeaView(APIView):
