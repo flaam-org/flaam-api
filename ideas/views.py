@@ -5,7 +5,7 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.exceptions import APIException, ValidationError
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -20,7 +20,7 @@ from .serializers import IdeaSerializer
 UserModel = get_user_model()
 
 
-class IdeaDetailView(RetrieveAPIView):
+class IdeaDetailView(RetrieveUpdateAPIView):
     """
     Retrieve a single idea.
     """
@@ -31,7 +31,6 @@ class IdeaDetailView(RetrieveAPIView):
         Idea.objects.all()
         .select_related("owner")
         .prefetch_related(
-            "milestones",
             "upvotes",
             "downvotes",
             "views",
@@ -56,8 +55,22 @@ class IdeaDetailView(RetrieveAPIView):
         },
     )
     def get(self, request: Request, pk: int, *args, **kwargs) -> Response:
+        # increment view count
         self.get_object().views.add(request.user)
         return super().get(request, pk, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=("ideas",),
+        operation_summary="Replace idea",
+        request_body=IdeaSerializer,
+        responses={
+            200: IdeaSerializer,
+            401: "Unauthorized.",
+            404: "Not found.",
+        },
+    )
+    def put(self, request: Request, *args, **kwargs) -> Response:
+        return super().put(request, *args, **kwargs)
 
     @swagger_auto_schema(
         tags=("ideas",),
@@ -69,25 +82,8 @@ class IdeaDetailView(RetrieveAPIView):
             404: "Not found.",
         },
     )
-    def put(self, request: Request, pk: int, *args, **kwargs) -> Response:
-        idea = self.get_queryset().get(pk=pk)
-        serializer = self.get_serializer(
-            idea, data=request.data, context={"request": request}, partial=True
-        )
-        if serializer.is_valid(raise_exception=True):
-            idea = serializer.save(owner=request.user)
-            # milestones = request.data.get("milestones", [])
-            # if milestones:
-            #     milestone_serializer = MilestoneSerializer(
-            #         data=milestones,
-            #         many=True,
-            #         context={"idea": idea},
-            #     )
-            #     if milestone_serializer.is_valid():
-            #         milestone_serializer.save()
-            #     else:
-            #         raise ValidationError(serializer.errors)
-        return Response(data=self.get_serializer(idea).data, status=status.HTTP_200_OK)
+    def patch(self, request: Request, *args, **kwargs) -> Response:
+        return super().patch(request, *args, **kwargs)
 
     @swagger_auto_schema(
         tags=("ideas",),
@@ -113,11 +109,20 @@ class IdeaListView(ListCreateAPIView):
     serializer_class = IdeaSerializer
 
     def get_queryset(self):
-        ideas = (
-            Idea.objects.all()
-            .select_related("owner")
+        ideas = Idea.objects.all()
+
+        bookmarked_by = self.request.query_params.get("bookmarked_by")
+        owner_id = self.request.query_params.get("owner_id")
+        if owner_id:
+            user = get_object_or_404(UserModel, pk=owner_id)
+            ideas = ideas.filter(owner=user)
+        elif bookmarked_by:
+            user = get_object_or_404(UserModel, pk=bookmarked_by)
+            ideas = user.bookmarked_ideas.all()
+
+        return (
+            ideas.select_related("owner")
             .prefetch_related(
-                "milestones",
                 "upvotes",
                 "downvotes",
                 "views",
@@ -131,51 +136,6 @@ class IdeaListView(ListCreateAPIView):
                 implementation_count=Count("implementations"),
             )
         )
-
-        owner_id = self.request.query_params.get("owner_id")
-        if owner_id:
-            user = get_object_or_404(UserModel, pk=owner_id)
-            return (
-                user.ideas.all()
-                .select_related("owner")
-                .prefetch_related(
-                    "milestones",
-                    "upvotes",
-                    "downvotes",
-                    "views",
-                    "tags",
-                    "implementations",
-                )
-                .annotate(
-                    upvote_count=Count("upvotes"),
-                    downvote_count=Count("downvotes"),
-                    view_count=Count("views"),
-                    implementation_count=Count("implementations"),
-                )
-            )
-
-        bookmarked_by = self.request.query_params.get("bookmarked_by")
-        if bookmarked_by:
-            user = get_object_or_404(UserModel, pk=bookmarked_by)
-            return (
-                user.bookmarked_ideas.all()
-                .select_related("owner")
-                .prefetch_related(
-                    "milestones",
-                    "upvotes",
-                    "downvotes",
-                    "views",
-                    "tags",
-                    "implementations",
-                )
-                .annotate(
-                    upvote_count=Count("upvotes"),
-                    downvote_count=Count("downvotes"),
-                    view_count=Count("views"),
-                    implementation_count=Count("implementations"),
-                )
-            )
-        return ideas
 
     @swagger_auto_schema(
         tags=("ideas",),
@@ -214,26 +174,7 @@ class IdeaListView(ListCreateAPIView):
         },
     )
     def post(self, request: Request, *args, **kwargs) -> Response:
-        serializer = self.get_serializer(
-            data=request.data, context={"request": request}, partial=True
-        )
-        if serializer.is_valid(raise_exception=True):
-            idea = serializer.save(owner=request.user)
-            # milestones = request.data.get("milestones", [])
-            # if milestones:
-            #     milestone_serializer = MilestoneSerializer(
-            #         data=milestones,
-            #         many=True,
-            #         context={"idea": idea},
-            #     )
-            #     if milestone_serializer.is_valid():
-            #         milestone_serializer.save()
-            #     else:
-            #         idea.delete()
-            #         raise ValidationError(serializer.errors)
-        return Response(
-            data=self.get_serializer(idea).data, status=status.HTTP_201_CREATED
-        )
+        return super().post(request, *args, **kwargs)
 
 
 class BookmarkIdeaView(APIView):

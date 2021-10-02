@@ -30,6 +30,7 @@ class IdeaAdmin(DjangoQLSearchMixin, admin.ModelAdmin):
                     "title",
                     "description",
                     "body",
+                    "milestones",
                     "tags",
                 )
             },

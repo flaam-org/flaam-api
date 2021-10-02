@@ -23,7 +23,7 @@ class Implementation(models.Model):
         "tags.Tag", blank=True, related_name="implementation_tags"
     )
     completed_milestones = ArrayField(
-        models.PositiveSmallIntegerField(), default=list, size=10
+        models.PositiveSmallIntegerField(), size=10, default=list, blank=True
     )
     upvotes = models.ManyToManyField(
         settings.AUTH_USER_MODEL, blank=True, related_name="upvoted_implementations"

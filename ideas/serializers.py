@@ -7,15 +7,15 @@ from .models import Idea
 
 
 class IdeaSerializer(serializers.ModelSerializer):
-    owner_avatar = serializers.SerializerMethodField()
-    owner_username = serializers.SerializerMethodField()
-    view_count = serializers.IntegerField()
-    implementation_count = serializers.IntegerField()
-    upvote_count = serializers.IntegerField()
-    downvote_count = serializers.IntegerField()
-    viewed = serializers.SerializerMethodField()
-    bookmarked = serializers.SerializerMethodField()
-    vote = serializers.SerializerMethodField()
+    owner_avatar = serializers.SerializerMethodField(read_only=True)
+    owner_username = serializers.SerializerMethodField(read_only=True)
+    view_count = serializers.IntegerField(read_only=True)
+    implementation_count = serializers.IntegerField(read_only=True)
+    upvote_count = serializers.IntegerField(read_only=True)
+    downvote_count = serializers.IntegerField(read_only=True)
+    viewed = serializers.SerializerMethodField(read_only=True)
+    bookmarked = serializers.SerializerMethodField(read_only=True)
+    vote = serializers.SerializerMethodField(read_only=True)
 
     def get_owner_avatar(self, obj):
         return obj.owner.avatar
@@ -78,4 +78,3 @@ class IdeaSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
-        read_only_fields = ("id", "owner", "created_at", "updated_at")
