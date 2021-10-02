@@ -6,7 +6,12 @@ from django.utils.timezone import datetime
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.exceptions import APIException, NotFound, ParseError
+from rest_framework.exceptions import (
+    APIException,
+    MethodNotAllowed,
+    NotFound,
+    ParseError,
+)
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -124,6 +129,9 @@ class UserProfileView(APIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def put(self, request: Request) -> Response:
+        raise MethodNotAllowed("PUT")
+
     @swagger_auto_schema(
         tags=("users",),
         operation_summary="Update authenticated user's profile",
@@ -134,7 +142,7 @@ class UserProfileView(APIView):
             401: "Unauthorized",
         },
     )
-    def put(self, request: Request) -> Response:
+    def patch(self, request: Request) -> Response:
         """Update user profile"""
         serializer = UserSerializer(request.user, data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
