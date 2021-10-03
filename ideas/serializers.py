@@ -53,8 +53,8 @@ class IdeaSerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         milestones = data.pop("milestones", None)
         ret = super().to_internal_value(data)
-        if milestones:
-            ret["milestones"] = [[sha1sum(m)[:8], m] for m in milestones]
+        if milestones is not None:
+            ret["milestones"] = [(sha1sum(m)[:8], m) for m in milestones]
         return ret
 
     class Meta:
