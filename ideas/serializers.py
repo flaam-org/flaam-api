@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from accounts import views
+from flaam_api.utils.primitives import sha1sum
 from tags.serializers import TagSerializer
 
 from .models import Idea
@@ -45,15 +46,16 @@ class IdeaSerializer(serializers.ModelSerializer):
         return 0
 
     def to_representation(self, instance):
-        representation = super().to_representation(instance)
-        representation["tags"] = TagSerializer(instance.tags.all(), many=True).data
-        return representation
+        ret = super().to_representation(instance)
+        ret["tags"] = TagSerializer(instance.tags.all(), many=True).data
+        return ret
 
-    def create(self, validated_data):
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        return super().update(instance, validated_data)
+    def to_internal_value(self, data):
+        milestones = data.pop("milestones", None)
+        ret = super().to_internal_value(data)
+        if milestones:
+            ret["milestones"] = [[sha1sum(m)[:8], m] for m in milestones]
+        return ret
 
     class Meta:
         model = Idea

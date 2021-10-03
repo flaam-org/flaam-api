@@ -11,7 +11,13 @@ class Idea(models.Model):
     description = models.TextField(max_length=500, blank=True)
     body = models.TextField(blank=True)
     milestones = ArrayField(
-        models.CharField(max_length=255), size=10, default=list, blank=True
+        ArrayField(
+            models.CharField(max_length=255),
+            size=2,
+        ),
+        size=10,
+        default=list,
+        blank=True,
     )
     tags = models.ManyToManyField("tags.Tag", related_name="idea_tags")
     draft = models.BooleanField(default=True)
