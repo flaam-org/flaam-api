@@ -8,8 +8,8 @@ from .models import Idea
 
 
 class IdeaSerializer(serializers.ModelSerializer):
-    owner_avatar = serializers.SerializerMethodField(read_only=True)
-    owner_username = serializers.SerializerMethodField(read_only=True)
+    owner_avatar = serializers.CharField(source="owner.avatar", read_only=True)
+    owner_username = serializers.CharField(source="owner.username", read_only=True)
     bookmarked = serializers.SerializerMethodField(read_only=True)
     viewed = serializers.SerializerMethodField(read_only=True)
     view_count = serializers.IntegerField(read_only=True)
@@ -17,12 +17,6 @@ class IdeaSerializer(serializers.ModelSerializer):
     upvote_count = serializers.IntegerField(read_only=True)
     downvote_count = serializers.IntegerField(read_only=True)
     implementation_count = serializers.IntegerField(read_only=True)
-
-    def get_owner_avatar(self, obj):
-        return obj.owner.avatar
-
-    def get_owner_username(self, obj):
-        return obj.owner.username
 
     def get_bookmarked(self, obj):
         request = self.context.get("request")
@@ -54,6 +48,7 @@ class IdeaSerializer(serializers.ModelSerializer):
         milestones = data.pop("milestones", None)
         ret = super().to_internal_value(data)
         if milestones is not None:
+            # store milestones in format: [[sha1sum, value]...]
             ret["milestones"] = [(sha1sum(m)[:8], m) for m in milestones]
         return ret
 
@@ -80,3 +75,4 @@ class IdeaSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+        read_only_fields = ("owner",)
