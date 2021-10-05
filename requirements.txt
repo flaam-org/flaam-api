@@ -1,7 +1,7 @@
 Django==3.2.7
 djangorestframework==3.12.4
 djangorestframework-simplejwt==4.8.0
-django-cors-headers==3.9.0
+django-cors-headers==3.10.0
 django-debug-toolbar==3.2.2
 django-heroku==0.3.1
 djangoql==0.15.3
