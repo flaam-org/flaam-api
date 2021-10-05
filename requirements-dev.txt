@@ -2,3 +2,4 @@
 ipython
 pipdeptree
 black
+isort
