@@ -61,6 +61,7 @@ class ImplementationSerializer(serializers.ModelSerializer):
             "draft",
             "is_validated",
             "is_accepted",
+            "bookmarked",
             "viewed",
             "view_count",
             "vote",
