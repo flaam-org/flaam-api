@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from accounts import views
 from flaam_api.utils.primitives import sha1sum
 from tags.serializers import TagSerializer
 
