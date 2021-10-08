@@ -1,3 +1,4 @@
+import django_filters
 from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
@@ -11,7 +12,6 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from flaam_api.utils.paginations import CustomLimitOffsetPagination
 from flaam_api.utils.permissions import IsOwnerOrReadOnly
 
 from .models import Idea
@@ -20,43 +20,61 @@ from .serializers import IdeaSerializer
 UserModel = get_user_model()
 
 
+class IdeaFilterSet(django_filters.FilterSet):
+
+    bookmarked_by = django_filters.ModelChoiceFilter(
+        field_name="bookmarked_by",
+        queryset=UserModel.objects.all(),
+        distinct=True,
+    )
+
+    class Meta:
+        model = Idea
+        fields = (
+            "owner",
+            "tags",
+            "bookmarked_by",
+            "draft",
+        )
+
+
 class IdeaListView(ListCreateAPIView):
     """
     List all ideas or create a new one.
     """
 
-    permission_classes = (IsAuthenticated,)
-    pagination_class = CustomLimitOffsetPagination
     serializer_class = IdeaSerializer
-
-    def get_queryset(self):
-        ideas = Idea.objects.all()
-
-        bookmarked_by = self.request.query_params.get("bookmarked_by")
-        owner_id = self.request.query_params.get("owner_id")
-        if owner_id:
-            user = get_object_or_404(UserModel, pk=owner_id)
-            ideas = ideas.filter(owner=user)
-        elif bookmarked_by:
-            user = get_object_or_404(UserModel, pk=bookmarked_by)
-            ideas = user.bookmarked_ideas.all()
-
-        return (
-            ideas.select_related("owner")
-            .prefetch_related(
-                "upvotes",
-                "downvotes",
-                "views",
-                "tags",
-                "implementations",
-            )
-            .annotate(
-                upvote_count=Count("upvotes"),
-                downvote_count=Count("downvotes"),
-                view_count=Count("views"),
-                implementation_count=Count("implementations"),
-            )
+    queryset = (
+        Idea.objects.all()
+        .select_related("owner")
+        .prefetch_related(
+            "upvotes",
+            "downvotes",
+            "views",
+            "tags",
+            "implementations",
         )
+        .annotate(
+            upvote_count=Count("upvotes"),
+            downvote_count=Count("downvotes"),
+            view_count=Count("views"),
+            implementation_count=Count("implementations"),
+        )
+    )
+    filterset_class = IdeaFilterSet
+    search_fields = (
+        "title",
+        "description",
+        "tags__name",
+    )
+    ordering_fields = (
+        "upvote_count",
+        "downvote_count",
+        "view_count",
+        "implementation_count",
+        "created_at",
+        "updated_at",
+    )
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -64,20 +82,6 @@ class IdeaListView(ListCreateAPIView):
     @swagger_auto_schema(
         tags=("ideas",),
         operation_summary="Get ideas",
-        manual_parameters=(
-            openapi.Parameter(
-                "owner_id",
-                in_=openapi.IN_QUERY,
-                type=openapi.TYPE_INTEGER,
-                description="Get user's ideas",
-            ),
-            openapi.Parameter(
-                "bookmarked_by",
-                in_=openapi.IN_QUERY,
-                type=openapi.TYPE_INTEGER,
-                description="Get user's bookmarked ideas",
-            ),
-        ),
         responses={
             200: IdeaSerializer(many=True),
             401: "Unauthorized.",
