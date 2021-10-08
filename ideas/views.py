@@ -137,6 +137,9 @@ class IdeaListView(ListCreateAPIView):
             )
         )
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
     @swagger_auto_schema(
         tags=("ideas",),
         operation_summary="Get ideas",
