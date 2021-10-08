@@ -35,6 +35,9 @@ class ImplementationListView(ListCreateAPIView):
 
     queryset = Implementation.objects.all()
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
     @swagger_auto_schema(
         tags=("implementations",),
         operation_summary="Get implementation list",
@@ -132,6 +135,9 @@ class ImplementationCommentListView(ListCreateAPIView):
     serializer_class = ImplementationCommentSerializer
 
     queryset = ImplementationComment.objects.all()
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
     @swagger_auto_schema(
         tags=("implementations",),
