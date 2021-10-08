@@ -20,85 +20,6 @@ from .serializers import IdeaSerializer
 UserModel = get_user_model()
 
 
-class IdeaDetailView(RetrieveUpdateAPIView):
-    """
-    Retrieve a single idea.
-    """
-
-    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
-    serializer_class = IdeaSerializer
-    queryset = (
-        Idea.objects.all()
-        .select_related("owner")
-        .prefetch_related(
-            "upvotes",
-            "downvotes",
-            "views",
-            "tags",
-            "implementations",
-        )
-        .annotate(
-            upvote_count=Count("upvotes"),
-            downvote_count=Count("downvotes"),
-            view_count=Count("views"),
-            implementation_count=Count("implementations"),
-        )
-    )
-
-    @swagger_auto_schema(
-        tags=("ideas",),
-        operation_summary="Get idea details",
-        responses={
-            200: IdeaSerializer,
-            401: "Unauthorized.",
-            404: "Not found.",
-        },
-    )
-    def get(self, request: Request, pk: int, *args, **kwargs) -> Response:
-        # increment view count
-        self.get_object().views.add(request.user)
-        return super().get(request, pk, *args, **kwargs)
-
-    @swagger_auto_schema(
-        tags=("ideas",),
-        operation_summary="Replace idea",
-        request_body=IdeaSerializer,
-        responses={
-            200: IdeaSerializer,
-            401: "Unauthorized.",
-            404: "Not found.",
-        },
-    )
-    def put(self, request: Request, *args, **kwargs) -> Response:
-        return super().put(request, *args, **kwargs)
-
-    @swagger_auto_schema(
-        tags=("ideas",),
-        operation_summary="Update idea details",
-        request_body=IdeaSerializer,
-        responses={
-            200: IdeaSerializer,
-            401: "Unauthorized.",
-            404: "Not found.",
-        },
-    )
-    def patch(self, request: Request, *args, **kwargs) -> Response:
-        return super().patch(request, *args, **kwargs)
-
-    @swagger_auto_schema(
-        tags=("ideas",),
-        operation_summary="Delete idea",
-        request_body=IdeaSerializer,
-        responses={
-            200: IdeaSerializer,
-            401: "Unauthorized.",
-            404: "Not found.",
-        },
-    )
-    def delete(self, request, *args, **kwargs):
-        raise APIException("Not Implemented")
-
-
 class IdeaListView(ListCreateAPIView):
     """
     List all ideas or create a new one.
@@ -178,6 +99,85 @@ class IdeaListView(ListCreateAPIView):
     )
     def post(self, request: Request, *args, **kwargs) -> Response:
         return super().post(request, *args, **kwargs)
+
+
+class IdeaDetailView(RetrieveUpdateAPIView):
+    """
+    Retrieve a single idea.
+    """
+
+    permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
+    serializer_class = IdeaSerializer
+    queryset = (
+        Idea.objects.all()
+        .select_related("owner")
+        .prefetch_related(
+            "upvotes",
+            "downvotes",
+            "views",
+            "tags",
+            "implementations",
+        )
+        .annotate(
+            upvote_count=Count("upvotes"),
+            downvote_count=Count("downvotes"),
+            view_count=Count("views"),
+            implementation_count=Count("implementations"),
+        )
+    )
+
+    @swagger_auto_schema(
+        tags=("ideas",),
+        operation_summary="Get idea details",
+        responses={
+            200: IdeaSerializer,
+            401: "Unauthorized.",
+            404: "Not found.",
+        },
+    )
+    def get(self, request: Request, pk: int, *args, **kwargs) -> Response:
+        # increment view count
+        self.get_object().views.add(request.user)
+        return super().get(request, pk, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=("ideas",),
+        operation_summary="Replace idea",
+        request_body=IdeaSerializer,
+        responses={
+            200: IdeaSerializer,
+            401: "Unauthorized.",
+            404: "Not found.",
+        },
+    )
+    def put(self, request: Request, *args, **kwargs) -> Response:
+        return super().put(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=("ideas",),
+        operation_summary="Update idea details",
+        request_body=IdeaSerializer,
+        responses={
+            200: IdeaSerializer,
+            401: "Unauthorized.",
+            404: "Not found.",
+        },
+    )
+    def patch(self, request: Request, *args, **kwargs) -> Response:
+        return super().patch(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        tags=("ideas",),
+        operation_summary="Delete idea",
+        request_body=IdeaSerializer,
+        responses={
+            200: IdeaSerializer,
+            401: "Unauthorized.",
+            404: "Not found.",
+        },
+    )
+    def delete(self, request, *args, **kwargs):
+        raise APIException("Not Implemented")
 
 
 class VoteIdeaView(APIView):

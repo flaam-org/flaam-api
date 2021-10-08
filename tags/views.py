@@ -17,23 +17,6 @@ from .serializers import TagDetailSerializer
 UserModel = get_user_model()
 
 
-class TagDetailView(RetrieveAPIView):
-    serializer_class = TagDetailSerializer
-    queryset = Tag.objects.all()
-
-    @swagger_auto_schema(
-        tags=("tags",),
-        operation_summary="Get tag details",
-        responses={
-            200: TagDetailSerializer,
-            401: "Unauthorized.",
-            404: "Not found.",
-        },
-    )
-    def get(self, request: Request, pk: int) -> Response:
-        return super().get(request, pk)
-
-
 class TagListView(ListCreateAPIView):
 
     pagination_class = CustomLimitOffsetPagination
@@ -100,6 +83,23 @@ class TagListView(ListCreateAPIView):
     )
     def post(self, request: Request) -> Response:
         return super().post(request)
+
+
+class TagDetailView(RetrieveAPIView):
+    serializer_class = TagDetailSerializer
+    queryset = Tag.objects.all()
+
+    @swagger_auto_schema(
+        tags=("tags",),
+        operation_summary="Get tag details",
+        responses={
+            200: TagDetailSerializer,
+            401: "Unauthorized.",
+            404: "Not found.",
+        },
+    )
+    def get(self, request: Request, pk: int) -> Response:
+        return super().get(request, pk)
 
 
 class FavouriteTagView(APIView):
