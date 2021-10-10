@@ -6,16 +6,19 @@ PROJECT_NAME := flaam_api
 SETTINGS := $(PROJECT_NAME).settings
 
 help: ## Display callable targets.
-	@egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
+	@egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | \
+	awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-check-venv:
-	@python -c "import venv" || { echo "install python-venv"; exit 1; }
+check-pipenv:
+	@pipenv --version || { echo "install pipenv"; exit 1; }
 
 check-direnv:
-	@which direnv > /dev/null || { echo "check this out https://direnv.net/#basic-installation"; exit 1; }
+	@which direnv > /dev/null || \
+	{ echo "check this out https://direnv.net/#basic-installation"; exit 1; }
 
-update: ## Install (and update) pip requirements
-	@.venv/bin/pip install -U -r requirements-dev.txt
+update: ## Install and update dependencies.
+	@echo "--> Updating dependencies"
+	@PIPENV_VERBOSITY=-1 pipenv update
 
 clean: ## Clean up.
 	@echo "--> Removing venv"
@@ -25,10 +28,10 @@ clean: ## Clean up.
 
 init: check-venv check-direnv ## Setup Dev environment.
 	@echo "--> Initializing"
-	@python -m venv .venv
+	@mkdir -p .venv
+	@pipenv install
 	@yes n | cp -vipr sample.envrc .envrc
 	@direnv allow
-	@make update
 
 migration: ## Create migrations.
 	@echo "--> Creating migrations"
@@ -48,7 +51,8 @@ clean-db: dump ## Clear database.
 
 loaddata: ## Load data from most recent db dump
 	@echo "--> Loading data from db dump"
-	@python manage.py loaddata $(shell ls -t db_dump_*.json | head -n 1) || { echo "Failed to load data"; exit 1; }
+	@python manage.py loaddata $(shell ls -t db_dump_*.json | head -n 1) || \
+	{ echo "Failed to load data"; exit 1; }
 
 init-db: ## Create database.
 	@echo "--> Creating database"
@@ -94,10 +98,6 @@ format: ## Format code.
 	@isort . --quiet
 	@black . --quiet
 	@echo "All clear!"
-
-freeze: ## Freeze dependencies.
-	$(eval DEV_DEPS := $(shell cat requirements-dev.txt | tr '\n' '\|'))
-	@pipdeptree -f 2>/dev/null | grep -v '^ ' | grep -vE '(${DEV_DEPS})' | tee requirements.txt
 
 deploy: ## Deploy to production.
 	@git push heroku main
