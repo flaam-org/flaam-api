@@ -4,28 +4,25 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
-django-cors-headers = "*"
-django-debug-toolbar = "*"
-django-filter = "*"
-django-heroku = "*"
-djangoql = "*"
-djangorestframework = "*"
+django = "==3.2.8"
+django-cors-headers = "==3.10.0"
+django-debug-toolbar = "==3.2.2"
+django-filter = "==21.1"
+django-heroku = "==0.3.1"
+djangoql = "==0.15.3"
+djangorestframework = "==3.12.4"
+djangorestframework-simplejwt = "==4.8.0"
+drf-yasg = "==1.20.0"
+gunicorn = "==20.1.0"
 pyjwt = "==2.1.0"
-psycopg2 = "*"
-drf-yasg = "*"
-gunicorn = "*"
-djangorestframework-simplejwt = "*"
-sentry-sdk = "*"
+psycopg2 = "==2.9.1"
+sentry-sdk = "==1.4.3"
 
 [dev-packages]
 ipython = "*"
 pre-commit = "*"
-black = "*"
+black = "==21.9b0"
 isort = "*"
 
 [requires]
 python_version = "3.9"
-
-[pipenv]
-allow_prereleases = true
