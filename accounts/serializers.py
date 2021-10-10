@@ -31,7 +31,7 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "password": {"write_only": True},
         }
-        read_only_fields = ("id", "last_login", "date_joined")
+        read_only_fields = ("id", "last_login", "date_joined", "followers")
 
     def create(self, validated_data):
         favourite_tags = validated_data.pop("favourite_tags", None)
@@ -68,6 +68,13 @@ class PublicUserSerializer(serializers.ModelSerializer):
             "last_login",
             "date_joined",
         )
+        read_only_fields = ("id", "last_login", "date_joined", "followers")
+
+    def create(self, validated_data):
+        raise NotImplementedError
+
+    def update(self, instance, validated_data):
+        raise NotImplementedError
 
 
 class ResetPasswordTokenSerializer(serializers.Serializer):
