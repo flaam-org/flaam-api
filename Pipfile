@@ -16,6 +16,7 @@ psycopg2 = "*"
 drf-yasg = "*"
 gunicorn = "*"
 djangorestframework-simplejwt = "*"
+sentry-sdk = "*"
 
 [dev-packages]
 ipython = "*"
