@@ -15,9 +15,9 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from flaam_api.utils.paginations import CustomLimitOffsetPagination
 from flaam_api.utils.permissions import IsOwnerOrReadOnly
 
+from .filters import ImplementationFilterSet
 from .models import Implementation, ImplementationComment
 from .serializers import ImplementationCommentSerializer, ImplementationSerializer
 
@@ -29,11 +29,36 @@ class ImplementationListView(ListCreateAPIView):
     Implementation list view.
     """
 
-    permission_classes = (IsAuthenticated,)
-    pagination_class = CustomLimitOffsetPagination
     serializer_class = ImplementationSerializer
-
-    queryset = Implementation.objects.all()
+    queryset = (
+        Implementation.objects.all()
+        .select_related("owner")
+        .prefetch_related(
+            "upvotes",
+            "downvotes",
+            "views",
+            "tags",
+            "comments",
+        )
+        .annotate(
+            upvotes_count=Count("upvotes"),
+            downvotes_count=Count("downvotes"),
+            views_count=Count("views"),
+            comments_count=Count("comments"),
+        )
+    )
+    ordering = ("-created_at",)
+    filterset_class = ImplementationFilterSet
+    search_fields = ("title", "description", "tags__name", "idea__title")
+    ordering_fields = (
+        "upvote_count",
+        "downvote_count",
+        "view_count",
+        "completed_milestones__len",
+        "comments_count",
+        "created_at",
+        "updated_at",
+    )
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -130,11 +155,13 @@ class ImplementationDetailView(RetrieveUpdateAPIView):
 
 class ImplementationCommentListView(ListCreateAPIView):
 
-    permission_classes = (IsAuthenticated,)
-    pagination_class = CustomLimitOffsetPagination
     serializer_class = ImplementationCommentSerializer
 
     queryset = ImplementationComment.objects.all()
+    ordering = ("-created_at",)
+    filterset_fields = ("implementation", "owner")
+    search_fields = ("body",)
+    ordering_fields = ("created_at", "updated_at", "upvotes")
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
