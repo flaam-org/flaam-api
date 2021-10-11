@@ -61,6 +61,7 @@ class IdeaListView(ListCreateAPIView):
             implementation_count=Count("implementations"),
         )
     )
+    ordering = ("-created_at",)
     filterset_class = IdeaFilterSet
     search_fields = (
         "title",
