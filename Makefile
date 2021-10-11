@@ -93,10 +93,9 @@ db-shell: ## Access db shell.
 test: ## Run tests.
 	@python manage.py test
 
-format: ## Format code.
+lint: ## Lint code.
 	@echo "--> Formatting code"
-	@isort . --quiet
-	@black . --quiet
+	@pre-commit run --all-files
 	@echo "All clear!"
 
 deploy: ## Deploy to production.
