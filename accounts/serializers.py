@@ -14,6 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
             "id",
             "username",
             "email",
+            "show_email",
             "password",
             "first_name",
             "last_name",
@@ -50,6 +51,11 @@ class UserSerializer(serializers.ModelSerializer):
 class PublicUserSerializer(serializers.ModelSerializer):
     """For public user profile"""
 
+    email = serializers.SerializerMethodField()
+
+    def get_email(self, instance):
+        return instance.email if instance.show_email else None
+
     class Meta:
         model = UserModel
         fields = (
@@ -57,6 +63,7 @@ class PublicUserSerializer(serializers.ModelSerializer):
             "username",
             "first_name",
             "last_name",
+            "email",
             "status",
             "description",
             "avatar",

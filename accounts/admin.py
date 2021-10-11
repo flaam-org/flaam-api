@@ -48,6 +48,7 @@ class UserAdmin(DjangoQLSearchMixin, BaseUserAdmin):
                     "first_name",
                     "last_name",
                     "email",
+                    "show_email",
                     "avatar",
                     "status",
                     "description",

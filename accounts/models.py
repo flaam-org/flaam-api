@@ -25,6 +25,7 @@ class User(AbstractUser):
         unique=True,
         verbose_name="email address",
     )
+    show_email = models.BooleanField(default=False)
     avatar = models.CharField(
         max_length=2048, blank=True, null=True, validators=[avatar_validator]
     )
