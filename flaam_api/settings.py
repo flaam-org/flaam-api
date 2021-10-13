@@ -14,9 +14,6 @@ from datetime import timedelta
 from os import getenv
 from pathlib import Path
 
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,21 +22,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-z-s@#g)698ljuvg5%&e!m(ce23!r_w2(9=nw3kcqmy3-d^8_1q"
+SECRET_KEY = getenv("SECRET_KEY", "insecure")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
-sentry_sdk.init(
-    dsn=getenv("SENTRY_DSN", ""),
-    integrations=[DjangoIntegration()],
-    environment=getenv("SENTRY_ENV", "development"),
-    traces_sample_rate=1.0,
-    send_default_pii=True,
-)
 
 # Application definition
 
@@ -160,10 +149,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom Settings
 
-CDN_PATH = BASE_DIR
-MEDIA_ROOT = "media/"
-STATIC_ROOT_DIR = "static/"
-
 AUTH_USER_MODEL = "accounts.User"
 
 REST_FRAMEWORK = {
@@ -217,5 +202,15 @@ PASSWORD_RESET_TOKEN_VALIDITY = timedelta(minutes=30)
 
 if getenv("HEROKU_ENVIRONMENT"):
     import django_heroku
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
 
     django_heroku.settings(locals())
+
+    sentry_sdk.init(
+        dsn=getenv("SENTRY_DSN"),
+        integrations=[DjangoIntegration()],
+        environment=getenv("SENTRY_ENV", "development"),
+        traces_sample_rate=1.0,
+        send_default_pii=True,
+    )
