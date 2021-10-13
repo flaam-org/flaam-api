@@ -1,6 +1,8 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.db import models
+from django.utils.timezone import datetime
 
 from .validators import UsernameValidator, avatar_validator
 
@@ -74,3 +76,7 @@ class PasswordResetToken(models.Model, PasswordResetTokenGenerator):
     def save(self, *args, **kwargs) -> None:
         self.token = self.generate_token()
         return super().save(*args, **kwargs)
+
+    def is_valid(self) -> bool:
+        token_time = self.created_at + settings.PASSWORD_RESET_TOKEN_VALIDITY
+        return token_time > datetime.now()

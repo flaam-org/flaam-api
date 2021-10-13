@@ -1,8 +1,7 @@
-from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
 from django.core.validators import EmailValidator
 from django.shortcuts import get_object_or_404
-from django.utils.timezone import datetime
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -151,7 +150,12 @@ class UserProfileView(APIView):
     )
     def delete(self, request: Request) -> Response:
         # Just deactivate the user
-        # TODO: send email that account will be deleted after x days
+        send_mail(
+            subject="Flaam | Account deactivated",
+            message="Your flaam account has been deactivated",
+            from_email=None,
+            recipient_list=[request.user.email],
+        )
         # TODO: add a delay period for deletion request
         request.user.is_active = False
         request.user.save()
@@ -203,7 +207,12 @@ class ResetPasswordTokenView(APIView):
 
         # generate token
         reset_token = PasswordResetToken.objects.get_or_create(user=user)
-        email = True  # TODO: send email
+        email = send_mail(
+            subject="Flaam | Password reset",
+            message=reset_token,
+            from_email=None,
+            recipient_list=[user.email],
+        )
         if email:
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
@@ -219,15 +228,12 @@ class ResetPasswordView(APIView):
     def get_object(self, token: str) -> PasswordResetToken:
         try:
             token = PasswordResetToken.objects.get(token=token)
-            is_token_valid = (
-                token.created_at + settings.PASSWORD_RESET_TOKEN_VALIDITY
-                > datetime.now()
-            )
-            if is_token_valid:
+            if token.is_valid():
                 return token
             token.delete()
-            raise PasswordResetToken.DoesNotExist
         except PasswordResetToken.DoesNotExist:
+            pass
+        finally:
             raise NotFound(detail={"detail": "Invalid token."})
 
     @swagger_auto_schema(
@@ -282,7 +288,12 @@ class ResetPasswordView(APIView):
 
         reset_token.user.set_password(password)
         reset_token.delete()
-        # TODO: send email
+        send_mail(
+            subject="Flaam | Password reset",
+            message="Your password has been reset",
+            from_email=None,
+            recipient_list=[reset_token.user.email],
+        )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
