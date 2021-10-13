@@ -1,5 +1,3 @@
-import django_filters
-from django.contrib.auth import get_user_model
 from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
@@ -14,28 +12,9 @@ from rest_framework.views import APIView
 
 from flaam_api.utils.permissions import IsOwnerOrReadOnly
 
+from .filters import IdeaFilterSet
 from .models import Idea
 from .serializers import IdeaSerializer
-
-UserModel = get_user_model()
-
-
-class IdeaFilterSet(django_filters.FilterSet):
-
-    bookmarked_by = django_filters.ModelChoiceFilter(
-        field_name="bookmarked_by",
-        queryset=UserModel.objects.all(),
-        distinct=True,
-    )
-
-    class Meta:
-        model = Idea
-        fields = (
-            "owner",
-            "tags",
-            "bookmarked_by",
-            "draft",
-        )
 
 
 class IdeaListView(ListCreateAPIView):
@@ -64,9 +43,8 @@ class IdeaListView(ListCreateAPIView):
     ordering = ("-created_at",)
     filterset_class = IdeaFilterSet
     search_fields = (
-        "title",
-        "description",
-        "tags__name",
+        "@title",
+        "@description",
     )
     ordering_fields = (
         "upvote_count",

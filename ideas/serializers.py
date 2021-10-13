@@ -44,10 +44,12 @@ class IdeaSerializer(serializers.ModelSerializer):
         return ret
 
     def to_internal_value(self, data):
+        data._mutable = True
         milestones = data.pop("milestones", None)
+        data._mutable = False
         ret = super().to_internal_value(data)
         if milestones is not None:
-            # store milestones in format: [[sha1sum, value]...]
+            # store milestones in format: [[sha1sum, title],...]
             ret["milestones"] = [(sha1sum(m)[:8], m) for m in milestones]
         return ret
 
