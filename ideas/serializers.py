@@ -1,3 +1,4 @@
+from django.http import QueryDict
 from rest_framework import serializers
 
 from flaam_api.utils.primitives import sha1sum
@@ -44,9 +45,9 @@ class IdeaSerializer(serializers.ModelSerializer):
         return ret
 
     def to_internal_value(self, data):
-        data._mutable = True
+        if isinstance(data, QueryDict):
+            data = data.dict()
         milestones = data.pop("milestones", None)
-        data._mutable = False
         ret = super().to_internal_value(data)
         if milestones is not None:
             # store milestones in format: [[sha1sum, title],...]
