@@ -1,8 +1,5 @@
-from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.db import models
-from django.utils.timezone import datetime
 
 from .validators import UsernameValidator, avatar_validator
 
@@ -60,23 +57,3 @@ class User(AbstractUser):
         if not self.avatar:
             self.avatar = f"https://avatars.dicebear.com/api/identicon/{self.email}.svg"
         super().save(*args, **kwargs)
-
-
-class PasswordResetToken(models.Model, PasswordResetTokenGenerator):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    token = models.CharField(max_length=100, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self) -> str:
-        return self.user.username
-
-    def generate_token(self) -> str:
-        return PasswordResetTokenGenerator().make_token(self.user)
-
-    def save(self, *args, **kwargs) -> None:
-        self.token = self.generate_token()
-        return super().save(*args, **kwargs)
-
-    def is_valid(self) -> bool:
-        token_time = self.created_at + settings.PASSWORD_RESET_TOKEN_VALIDITY
-        return token_time > datetime.now()

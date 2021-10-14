@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from .validators import PasswordValidator
+
 UserModel = get_user_model()
 
 
@@ -84,7 +86,7 @@ class PublicUserSerializer(serializers.ModelSerializer):
         raise NotImplementedError
 
 
-class ResetPasswordTokenSerializer(serializers.Serializer):
+class PasswordResetTokenSerializer(serializers.Serializer):
     """Serializer to get reset password token"""
 
     email = serializers.EmailField(required=True)
@@ -93,6 +95,12 @@ class ResetPasswordTokenSerializer(serializers.Serializer):
         if UserModel.objects.filter(email=value).exists():
             return value
         raise ValidationError("Email does not exist")
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    """Serializer to change password"""
+
+    password = serializers.CharField(required=True, validators=(PasswordValidator(),))
 
 
 class TokenObtainPairResponseSerializer(serializers.Serializer):

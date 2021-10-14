@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from djangoql.admin import DjangoQLSearchMixin
 
-from .models import PasswordResetToken, User
+from .models import User
 
 
 class UserAdmin(DjangoQLSearchMixin, BaseUserAdmin):
@@ -83,25 +83,4 @@ class UserAdmin(DjangoQLSearchMixin, BaseUserAdmin):
     )
 
 
-class PasswordResetTokenAdmin(admin.ModelAdmin):
-    list_display = (
-        "get_username",
-        "created_at",
-        "token",
-    )
-    search_fields = (
-        "user__username",
-        "user__email",
-        "user__id",
-        "token",
-    )
-
-    def get_username(self, obj):
-        return obj.user.username
-
-    get_username.short_description = "Username"
-    get_username.admin_order_field = "user__username"
-
-
 admin.site.register(User, UserAdmin)
-admin.site.register(PasswordResetToken, PasswordResetTokenAdmin)

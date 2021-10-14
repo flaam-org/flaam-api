@@ -29,7 +29,7 @@ urlpatterns = [
         name="reset_password",
     ),
     path(
-        "password/reset/<str:token>",
+        "password/reset/<str:uidb64>/<str:token>",
         ResetPasswordView.as_view(),
         name="reset_password",
     ),

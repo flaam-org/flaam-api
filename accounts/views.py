@@ -1,11 +1,14 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
 from django.core.validators import EmailValidator
 from django.shortcuts import get_object_or_404
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.exceptions import APIException, NotFound, ParseError
+from rest_framework.exceptions import APIException, ParseError
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -17,16 +20,17 @@ from rest_framework_simplejwt.views import (
     TokenVerifyView,
 )
 
-from .models import PasswordResetToken, User
+from .models import User
 from .serializers import (
+    PasswordResetSerializer,
+    PasswordResetTokenSerializer,
     PublicUserSerializer,
-    ResetPasswordTokenSerializer,
     TokenObtainPairResponseSerializer,
     TokenRefreshResponseSerializer,
     TokenVerifyResponseSerializer,
     UserSerializer,
 )
-from .validators import PasswordValidator, UsernameValidator
+from .validators import UsernameValidator
 
 UserModel: User = get_user_model()
 
@@ -193,7 +197,7 @@ class ResetPasswordTokenView(APIView):
         security=[],
         operation_id="accounts_password_reset_token_create",
         operation_summary="Obtain a password reset token",
-        request_body=ResetPasswordTokenSerializer,
+        request_body=PasswordResetTokenSerializer,
         responses={
             204: "",
             400: "Bad request",
@@ -201,22 +205,25 @@ class ResetPasswordTokenView(APIView):
     )
     def post(self, request: Request) -> Response:
         """generate password reset token"""
-        serializer = ResetPasswordTokenSerializer(data=request.data)
+        serializer = PasswordResetTokenSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
-            user = serializer.validated_data["user"]
+            user = get_object_or_404(
+                UserModel, email=serializer.validated_data["email"]
+            )
+            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+            token = PasswordResetTokenGenerator().make_token(user)
 
-        # generate token
-        reset_token = PasswordResetToken.objects.get_or_create(user=user)
-        email = send_mail(
-            subject="Flaam | Password reset",
-            message=reset_token,
-            from_email=None,
-            recipient_list=[user.email],
-        )
-        if email:
+        try:
+            print(f"{uidb64=} {token=}")
+            send_mail(
+                subject="Flaam | Password reset",
+                message=f"{uidb64=} {token=}",
+                from_email=None,
+                recipient_list=[user.email],
+            )
             return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            raise APIException(detail={"detail": "Failed to send Email."})
+        except Exception as e:
+            APIException(detail={"detail": str(e)})
 
 
 class ResetPasswordView(APIView):
@@ -224,17 +231,6 @@ class ResetPasswordView(APIView):
 
     authentication_classes = ()
     permission_classes = (AllowAny,)
-
-    def get_object(self, token: str) -> PasswordResetToken:
-        try:
-            token = PasswordResetToken.objects.get(token=token)
-            if token.is_valid():
-                return token
-            token.delete()
-        except PasswordResetToken.DoesNotExist:
-            pass
-        finally:
-            raise NotFound(detail={"detail": "Invalid token."})
 
     @swagger_auto_schema(
         tags=("auth",),
@@ -255,15 +251,21 @@ class ResetPasswordView(APIView):
             400: "Invalid reset token",
         },
     )
-    def get(self, request: Request, token) -> Response:
+    def get(self, request: Request, uidb64, token) -> Response:
         """Check reset token"""
-        reset_token: PasswordResetToken = self.get_object(token)
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = get_object_or_404(UserModel, pk=uid)
+        if PasswordResetTokenGenerator().check_token(user, token):
+            return Response(
+                {
+                    "username": user.username,
+                    "email": user.email,
+                },
+                status=status.HTTP_200_OK,
+            )
         return Response(
-            {
-                "username": reset_token.user.username,
-                "email": reset_token.user.email,
-            },
-            status=status.HTTP_200_OK,
+            {"detail": "Invalid reset token"},
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
     @swagger_auto_schema(
@@ -271,30 +273,37 @@ class ResetPasswordView(APIView):
         security=[],
         operation_id="accounts_password_reset",
         operation_summary="Reset user password",
+        request_body=PasswordResetSerializer,
         responses={
-            204: "",
-            status.HTTP_404_NOT_FOUND: "Invalid token",
+            200: TokenObtainPairResponseSerializer,
+            400: "Invalid token",
         },
     )
-    def post(self, request: Request, token) -> Response:
+    def post(self, request: Request, uidb64, token) -> Response:
         """Reset password"""
-        reset_token: PasswordResetToken = self.get_object(token)
-        password = request.data.get("password")
-        if not password:
-            raise ParseError(detail={"detail": "Password is required."})
-
-        # validate password
-        PasswordValidator()(password)
-
-        reset_token.user.set_password(password)
-        reset_token.delete()
-        send_mail(
-            subject="Flaam | Password reset",
-            message="Your password has been reset",
-            from_email=None,
-            recipient_list=[reset_token.user.email],
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = get_object_or_404(UserModel, pk=uid)
+        if PasswordResetTokenGenerator().check_token(user, token):
+            serializer = PasswordResetSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                user.set_password(serializer.validated_data["password"])
+                # TODO: blacklist outstanding jwt tokens
+                send_mail(
+                    subject="Flaam | Password reset",
+                    message="Your password has been reset",
+                    from_email=None,
+                    recipient_list=[user.email],
+                )
+                refresh = RefreshToken.for_user(user)
+                data = {
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                }
+                return Response(data, status=status.HTTP_200_OK)
+        return Response(
+            {"detail": "Invalid reset token"},
+            status=status.HTTP_400_BAD_REQUEST,
         )
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class DecoratedTokenObtainPairView(TokenObtainPairView):

@@ -204,7 +204,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
-PASSWORD_RESET_TOKEN_VALIDITY = timedelta(minutes=30)
+PASSWORD_RESET_TIMEOUT = 10 * 60  # seconds
 
 # Heroku Settings
 
