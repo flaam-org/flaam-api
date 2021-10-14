@@ -223,7 +223,7 @@ class ResetPasswordTokenView(APIView):
             )
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
-            APIException(detail={"detail": str(e)})
+            raise APIException(detail={"detail": str(e)})
 
 
 class ResetPasswordView(APIView):
