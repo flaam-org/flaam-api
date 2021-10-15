@@ -216,7 +216,9 @@ class ResetPasswordTokenView(APIView):
             token = PasswordResetTokenGenerator().make_token(user)
 
         try:
-            message = f"{uidb64=} {token=}"
+            message = (
+                f"{settings.FRONTEND_URL}/reset-password?uidb64={uidb64}&token={token}"
+            )
             print(message)  # TODO: no prod
             send_mail(
                 subject="Flaam | Password reset",

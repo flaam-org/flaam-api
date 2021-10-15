@@ -194,13 +194,15 @@ SWAGGER_SETTINGS = {
     },
 }
 
+FRONTEND_URL = "https://flaam-react.yeager.workers.dev"
+
 INTERNAL_IPS = [
     "127.0.0.1",
     "localhost",
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://flaam-react.yeager.workers.dev",
+    FRONTEND_URL,
     "http://localhost:3000",
 ]
 
