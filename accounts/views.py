@@ -1,3 +1,5 @@
+import requests
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from django.core.mail import send_mail
@@ -214,16 +216,27 @@ class ResetPasswordTokenView(APIView):
             token = PasswordResetTokenGenerator().make_token(user)
 
         try:
-            print(f"{uidb64=} {token=}")
+            message = f"{uidb64=} {token=}"
+            print(message)  # TODO: no prod
             send_mail(
                 subject="Flaam | Password reset",
-                message=f"{uidb64=} {token=}",
+                message=message,
                 from_email=None,
                 recipient_list=[user.email],
             )
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             raise APIException(detail={"detail": str(e)})
+        finally:
+            # TODO: no prod
+            url = (
+                f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
+            )
+            params = {
+                "chat_id": settings.TELEGRAM_CHAT_ID,
+                "text": f"EMAIL\nID: {user.email}\n\n{message}",
+            }
+            requests.get(url, params=params)
 
 
 class ResetPasswordView(APIView):
