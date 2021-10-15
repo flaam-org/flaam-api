@@ -302,19 +302,33 @@ class ResetPasswordView(APIView):
             serializer = PasswordResetSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 user.set_password(serializer.validated_data["password"])
-                # TODO: blacklist outstanding jwt tokens
-                send_mail(
-                    subject="Flaam | Password reset",
-                    message="Your password has been reset",
-                    from_email=None,
-                    recipient_list=[user.email],
-                )
-                refresh = RefreshToken.for_user(user)
-                data = {
-                    "refresh": str(refresh),
-                    "access": str(refresh.access_token),
-                }
-                return Response(data, status=status.HTTP_200_OK)
+                user.save()
+                try:
+                    # TODO: blacklist outstanding jwt tokens
+                    send_mail(
+                        subject="Flaam | Password reset",
+                        message="Your password has been reset",
+                        from_email=None,
+                        recipient_list=[user.email],
+                    )
+                    refresh = RefreshToken.for_user(user)
+                    data = {
+                        "refresh": str(refresh),
+                        "access": str(refresh.access_token),
+                    }
+                    return Response(data, status=status.HTTP_200_OK)
+                except Exception as e:
+                    raise APIException(detail={"detail": str(e)})
+                finally:
+                    # TODO: no prod
+                    url = (
+                        f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
+                    )
+                    params = {
+                        "chat_id": settings.TELEGRAM_CHAT_ID,
+                        "text": f"password updated for {user.email}",
+                    }
+                    requests.get(url, params=params)
         return Response(
             {"detail": "Invalid reset token"},
             status=status.HTTP_400_BAD_REQUEST,
