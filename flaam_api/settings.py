@@ -151,7 +151,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "accounts.User"
 
-AUTHENTICATION_BACKENDS = ["accounts.auth.EmailThenUsernameModelBackend"]
+AUTHENTICATION_BACKENDS = ("accounts.auth.EmailOrUsernameModelBackend",)
 
 REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "flaam_api.utils.exceptions.exception_handler",
