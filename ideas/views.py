@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.exceptions import APIException, ParseError
+from rest_framework.exceptions import ParseError
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -86,7 +86,7 @@ class IdeaListView(ListCreateAPIView):
 
 class IdeaDetailView(RetrieveUpdateAPIView):
     """
-    Retrieve a single idea.
+    Retrieve, update or delete an idea instance.
     """
 
     permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
@@ -160,7 +160,15 @@ class IdeaDetailView(RetrieveUpdateAPIView):
         },
     )
     def delete(self, request, *args, **kwargs):
-        raise APIException("Not Implemented")
+        idea = self.get_object()
+        if idea.implementations.count() > 0:
+            idea.archived = True
+            idea.save()
+            resp_msg = "Idea archived."
+        else:
+            idea.delete()
+            resp_msg = "Idea deleted."
+        return Response({"detail": resp_msg}, status=status.HTTP_200_OK)
 
 
 class VoteIdeaView(APIView):

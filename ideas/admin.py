@@ -26,6 +26,7 @@ class IdeaAdmin(DjangoQLSearchMixin, admin.ModelAdmin):
                     "id",
                     "owner",
                     "draft",
+                    "archived",
                     "title",
                     "description",
                     "body",

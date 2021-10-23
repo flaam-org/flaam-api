@@ -67,6 +67,7 @@ class IdeaSerializer(serializers.ModelSerializer):
             "tags",
             "milestones",
             "draft",
+            "archived",
             "bookmarked",
             "viewed",
             "view_count",

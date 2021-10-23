@@ -21,4 +21,5 @@ class IdeaFilterSet(django_filters.FilterSet):
             "tags",
             "bookmarked_by",
             "draft",
+            "archived",
         )

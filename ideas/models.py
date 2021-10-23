@@ -21,6 +21,7 @@ class Idea(models.Model):
     )
     tags = models.ManyToManyField("tags.Tag", related_name="idea_tags")
     draft = models.BooleanField(default=True)
+    archived = models.BooleanField(default=False)
     upvotes = models.ManyToManyField(
         settings.AUTH_USER_MODEL, blank=True, related_name="upvoted_ideas"
     )
