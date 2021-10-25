@@ -43,7 +43,7 @@ migrate: ## Migrate database.
 
 dump: ## Dump database.
 	@echo "--> Dumping database"
-	@python manage.py dumpdata > db_dump_$(shell date +%FT%T.%3N%Z).json
+	@python manage.py dumpdata tags accounts ideas implementations discussions > db_dump_$(shell date +%FT%T.%3N%Z).json
 
 clean-db: dump ## Clear database.
 	@echo "--> Dropping database"
