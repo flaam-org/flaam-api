@@ -74,6 +74,18 @@ class ImplementationSerializer(serializers.ModelSerializer):
 
 
 class ImplementationCommentSerializer(serializers.ModelSerializer):
+    owner_avatar = serializers.CharField(source="owner.avatar", read_only=True)
+    owner_username = serializers.CharField(source="owner.username", read_only=True)
+
     class Meta:
         model = ImplementationComment
-        fields = "__all__"
+        fields = (
+            "id",
+            "implementation",
+            "body",
+            "owner",
+            "owner_avatar",
+            "owner_username",
+            "created_at",
+            "updated_at",
+        )
