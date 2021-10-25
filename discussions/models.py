@@ -27,8 +27,5 @@ class DiscussionComment(models.Model):
     discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     body = models.TextField(max_length=500)
-    upvotes = models.ManyToManyField(
-        settings.AUTH_USER_MODEL, related_name="upvoted_discussion_comments"
-    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
