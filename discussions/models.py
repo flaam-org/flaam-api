@@ -9,9 +9,6 @@ class Discussion(models.Model):
         "ideas.Idea", on_delete=models.CASCADE, related_name="discussions"
     )
     body = models.TextField(blank=True)
-    tags = models.ManyToManyField(
-        "tags.Tag", blank=True, related_name="discussion_tags"
-    )
     draft = models.BooleanField(default=True)
     upvotes = models.ManyToManyField(
         settings.AUTH_USER_MODEL, blank=True, related_name="upvoted_discussions"
