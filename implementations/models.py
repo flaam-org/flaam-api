@@ -51,11 +51,6 @@ class ImplementationComment(models.Model):
         related_name="implementation_comments",
     )
     body = models.TextField(max_length=500)
-    upvotes = models.ManyToManyField(
-        settings.AUTH_USER_MODEL,
-        blank=True,
-        related_name="upvoted_implementation_comments",
-    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

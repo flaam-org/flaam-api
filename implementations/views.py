@@ -293,46 +293,6 @@ class VoteImplementationView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class VoteImplementationCommentView(APIView):
-    """
-    Vote implementation comment view.
-    """
-
-    permission_classes = (IsAuthenticated,)
-
-    @swagger_auto_schema(
-        tags=("implementations",),
-        operation_summary="Vote implementation comment",
-        manual_parameters=(
-            openapi.Parameter(
-                "value",
-                in_=openapi.IN_QUERY,
-                type=openapi.TYPE_INTEGER,
-                description="Vote, possible values: [0, 1]",
-            ),
-        ),
-        responses={
-            204: "Success.",
-            400: "Bad request.",
-            401: "Unauthorized.",
-            404: "Not found.",
-        },
-    )
-    def post(self, request: Request, pk: int, *args, **kwargs) -> Response:
-        implementation_comment = get_object_or_404(ImplementationComment, pk=pk)
-        value = request.query_params.get("value")
-
-        value = request.query_params.get("value")
-        if value == "0":
-            implementation_comment.upvotes.remove(request.user)
-        elif value == "1":
-            implementation_comment.upvotes.add(request.user)
-        else:
-            raise ParseError("Invalid vote value.")
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
 class ValidateImplementationView(APIView):
     """
     Validate implementation view.

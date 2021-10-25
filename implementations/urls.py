@@ -7,7 +7,6 @@ from .views import (
     ImplementationDetailView,
     ImplementationListView,
     ValidateImplementationView,
-    VoteImplementationCommentView,
     VoteImplementationView,
 )
 
@@ -46,10 +45,5 @@ urlpatterns = [
         "implementation/comment/<int:pk>",
         ImplementationCommentDetailView.as_view(),
         name="implementation-comment-detail",
-    ),
-    path(
-        "implementation/comment/<int:pk>/vote",
-        VoteImplementationCommentView.as_view(),
-        name="vote-implementation-comment",
     ),
 ]
