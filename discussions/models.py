@@ -1,14 +1,17 @@
 from django.conf import settings
 from django.db import models
 
-from tags.models import Tag
-
 
 class Discussion(models.Model):
-    name = models.CharField(max_length=255)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    idea = models.ForeignKey(
+        "ideas.Idea", on_delete=models.CASCADE, related_name="discussions"
+    )
     body = models.TextField(blank=True)
-    tags = models.ManyToManyField(Tag, related_name="discussion_tags")
+    tags = models.ManyToManyField(
+        "tags.Tag", blank=True, related_name="discussion_tags"
+    )
     draft = models.BooleanField(default=True)
     upvotes = models.ManyToManyField(
         settings.AUTH_USER_MODEL, blank=True, related_name="upvoted_discussions"
@@ -22,10 +25,22 @@ class Discussion(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self) -> str:
+        return f"D{self.id}"
+
 
 class DiscussionComment(models.Model):
-    discussion = models.ForeignKey(Discussion, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    discussion = models.ForeignKey(
+        Discussion, on_delete=models.CASCADE, related_name="comments"
+    )
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="discussion_comments",
+    )
     body = models.TextField(max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"DC{self.id}"
