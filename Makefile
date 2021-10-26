@@ -56,7 +56,6 @@ loaddata: ## Load data from most recent db dump
 
 init-db: ## Create database.
 	@echo "--> Creating database"
-	@python manage.py createdb
 	@make migration migrate loaddata
 
 reinit-db: clean-db init-db ## Re-initialize database.
