@@ -149,7 +149,7 @@ class ImplementationDetailView(RetrieveUpdateDestroyAPIView):
         return super().patch(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=("implementation",),
+        tags=("implementations",),
         operation_summary="Delete implementation",
         responses={
             204: "No content.",
@@ -174,7 +174,7 @@ class ImplementationCommentListView(ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
     @swagger_auto_schema(
-        tags=("implementations",),
+        tags=("implementation-comments",),
         operation_summary="Get implementation comment list",
         responses={
             200: ImplementationCommentSerializer(many=True),
@@ -185,7 +185,7 @@ class ImplementationCommentListView(ListCreateAPIView):
         return super().get(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=("implementations",),
+        tags=("implementation-comments",),
         operation_summary="Create implementation comment",
         request_body=ImplementationCommentSerializer,
         responses={
@@ -205,7 +205,7 @@ class ImplementationCommentDetailView(RetrieveUpdateDestroyAPIView):
     queryset = ImplementationComment.objects.all()
 
     @swagger_auto_schema(
-        tags=("implementations",),
+        tags=("implementation-comments",),
         operation_summary="Get implementation comment details",
         responses={
             200: ImplementationCommentSerializer,
@@ -217,7 +217,7 @@ class ImplementationCommentDetailView(RetrieveUpdateDestroyAPIView):
         return super().get(request, pk, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=("implementations",),
+        tags=("implementation-comments",),
         operation_summary="Replace implementation comment",
         request_body=ImplementationCommentSerializer,
         responses={
@@ -230,7 +230,7 @@ class ImplementationCommentDetailView(RetrieveUpdateDestroyAPIView):
         return super().put(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=("implementations",),
+        tags=("implementation-comments",),
         operation_summary="Update implementation comment details",
         request_body=ImplementationCommentSerializer,
         responses={
@@ -243,7 +243,7 @@ class ImplementationCommentDetailView(RetrieveUpdateDestroyAPIView):
         return super().patch(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=("implementations",),
+        tags=("implementation-comments",),
         operation_summary="Delete implementation comment",
         responses={
             204: "No content.",
