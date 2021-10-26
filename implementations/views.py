@@ -4,12 +4,8 @@ from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.exceptions import ParseError, PermissionDenied
-from rest_framework.generics import (
-    ListCreateAPIView,
-    RetrieveUpdateAPIView,
-    RetrieveUpdateDestroyAPIView,
-)
+from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -87,9 +83,9 @@ class ImplementationListView(ListCreateAPIView):
         return super().post(request, *args, **kwargs)
 
 
-class ImplementationDetailView(RetrieveUpdateAPIView):
+class ImplementationDetailView(RetrieveUpdateDestroyAPIView):
     """
-    Implementation detail view.
+    Retrieve, update or delete a implementation instance.
     """
 
     permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
@@ -121,14 +117,14 @@ class ImplementationDetailView(RetrieveUpdateAPIView):
             404: "Not found.",
         },
     )
-    def get(self, request: Request, pk: int, *args, **kwargs) -> Response:
+    def get(self, request: Request, *args, **kwargs) -> Response:
         # increment view count
         self.get_object().views.add(request.user)
-        return super().get(request, pk, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     @swagger_auto_schema(
         tags=("implementations",),
-        operation_summary="Replace idea",
+        operation_summary="Replace implementation",
         request_body=ImplementationSerializer,
         responses={
             200: ImplementationSerializer,
@@ -141,7 +137,7 @@ class ImplementationDetailView(RetrieveUpdateAPIView):
 
     @swagger_auto_schema(
         tags=("implementations",),
-        operation_summary="Update idea details",
+        operation_summary="Update implementation details",
         request_body=ImplementationSerializer,
         responses={
             200: ImplementationSerializer,
@@ -152,16 +148,27 @@ class ImplementationDetailView(RetrieveUpdateAPIView):
     def patch(self, request: Request, *args, **kwargs) -> Response:
         return super().patch(request, *args, **kwargs)
 
+    @swagger_auto_schema(
+        tags=("implementation",),
+        operation_summary="Delete implementation",
+        responses={
+            204: "No content.",
+            401: "Unauthorized.",
+            404: "Not found.",
+        },
+    )
+    def delete(self, request: Request, *args, **kwargs) -> Response:
+        return super().delete(request, *args, **kwargs)
+
 
 class ImplementationCommentListView(ListCreateAPIView):
 
     serializer_class = ImplementationCommentSerializer
-
-    queryset = ImplementationComment.objects.all()
+    queryset = ImplementationComment.objects.select_related("owner").all()
     ordering = ("-created_at",)
     filterset_fields = ("implementation", "owner")
     search_fields = ("body",)
-    ordering_fields = ("created_at", "updated_at", "upvotes")
+    ordering_fields = ("created_at", "updated_at")
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -288,7 +295,7 @@ class VoteImplementationView(APIView):
             implementation.downvotes.add(request.user)
             implementation.upvotes.remove(request.user)
         else:
-            raise ParseError("Invalid vote value.")
+            raise ValidationError("Invalid vote value.")
 
         return Response(status=status.HTTP_204_NO_CONTENT)
 
