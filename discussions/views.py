@@ -171,7 +171,7 @@ class DiscussionCommentListView(ListCreateAPIView):
         serializer.save(owner=self.request.user)
 
     @swagger_auto_schema(
-        tags=("discussions",),
+        tags=("discussion-comments",),
         operation_summary="Get discussion comments list",
         responses={
             200: DiscussionCommentSerializer(many=True),
@@ -182,7 +182,7 @@ class DiscussionCommentListView(ListCreateAPIView):
         return super().get(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=("discussions",),
+        tags=("discussion-comments",),
         operation_summary="Create discussion comment",
         request_body=DiscussionCommentSerializer,
         responses={
@@ -204,7 +204,7 @@ class DiscussionCommentDetailView(RetrieveUpdateDestroyAPIView):
     queryset = DiscussionComment.objects.all().select_related("owner")
 
     @swagger_auto_schema(
-        tags=("discussions",),
+        tags=("discussion-comments",),
         operation_summary="Get discussion comment",
         responses={
             200: DiscussionCommentSerializer,
@@ -216,7 +216,7 @@ class DiscussionCommentDetailView(RetrieveUpdateDestroyAPIView):
         return super().get(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=("discussions",),
+        tags=("discussion-comments",),
         operation_summary="Update discussion comment",
         request_body=DiscussionCommentSerializer,
         responses={
@@ -229,7 +229,7 @@ class DiscussionCommentDetailView(RetrieveUpdateDestroyAPIView):
         return super().put(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=("discussions",),
+        tags=("discussion-comments",),
         operation_summary="Update discussion comment",
         request_body=DiscussionCommentSerializer,
         responses={
@@ -242,7 +242,7 @@ class DiscussionCommentDetailView(RetrieveUpdateDestroyAPIView):
         return super().patch(request, *args, **kwargs)
 
     @swagger_auto_schema(
-        tags=("discussions",),
+        tags=("discussion-comments",),
         operation_summary="Delete discussion comment",
         responses={
             204: "No content.",
