@@ -3,6 +3,24 @@ from rest_framework import serializers
 from .models import Discussion, DiscussionComment
 
 
+class DiscussionCommentSerializer(serializers.ModelSerializer):
+    owner_avatar = serializers.CharField(source="owner.avatar", read_only=True)
+    owner_username = serializers.CharField(source="owner.username", read_only=True)
+
+    class Meta:
+        model = DiscussionComment
+        fields = (
+            "id",
+            "discussion",
+            "body",
+            "owner",
+            "owner_avatar",
+            "owner_username",
+            "created_at",
+            "updated_at",
+        )
+
+
 class DiscussionSerializer(serializers.ModelSerializer):
     owner_avatar = serializers.CharField(source="owner.avatar", read_only=True)
     owner_username = serializers.CharField(source="owner.username", read_only=True)
@@ -29,14 +47,6 @@ class DiscussionSerializer(serializers.ModelSerializer):
                 return -1
         return 0
 
-    def to_representation(self, instance: Discussion):
-        ret = super().to_representation(instance)
-        ret["comments"] = DiscussionCommentSerializer(
-            instance.comments.all().order_by("created_at").select_related("owner")[:5],
-            many=True,
-        ).data
-        return ret
-
     class Meta:
         model = Discussion
         fields = (
@@ -52,24 +62,6 @@ class DiscussionSerializer(serializers.ModelSerializer):
             "upvote_count",
             "downvote_count",
             "comments_count",
-            "created_at",
-            "updated_at",
-        )
-
-
-class DiscussionCommentSerializer(serializers.ModelSerializer):
-    owner_avatar = serializers.CharField(source="owner.avatar", read_only=True)
-    owner_username = serializers.CharField(source="owner.username", read_only=True)
-
-    class Meta:
-        model = DiscussionComment
-        fields = (
-            "id",
-            "discussion",
-            "body",
-            "owner",
-            "owner_avatar",
-            "owner_username",
             "created_at",
             "updated_at",
         )
