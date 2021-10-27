@@ -19,7 +19,6 @@ class ImplementationFilterSet(django_filters.FilterSet):
         fields = (
             "idea",
             "owner",
-            "tags",
             "bookmarked_by",
             "draft",
             "is_validated",

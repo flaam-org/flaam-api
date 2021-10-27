@@ -33,7 +33,6 @@ class ImplementationListView(ListCreateAPIView):
             "upvotes",
             "downvotes",
             "views",
-            "tags",
             "comments",
         )
         .annotate(
@@ -97,7 +96,6 @@ class ImplementationDetailView(RetrieveUpdateDestroyAPIView):
             "upvotes",
             "downvotes",
             "views",
-            "tags",
             "comments",
         )
         .annotate(

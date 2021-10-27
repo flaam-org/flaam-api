@@ -17,6 +17,7 @@ class ImplementationSerializer(serializers.ModelSerializer):
     downvote_count = serializers.IntegerField(read_only=True)
     comments_count = serializers.IntegerField(read_only=True)
     milestones = serializers.ListField(source="idea.milestones", read_only=True)
+    tags = serializers.SerializerMethodField(read_only=True)
 
     def get_bookmarked(self, obj):
         request = self.context.get("request")
@@ -39,10 +40,8 @@ class ImplementationSerializer(serializers.ModelSerializer):
                 return -1
         return 0
 
-    def to_representation(self, instance):
-        ret = super().to_representation(instance)
-        ret["tags"] = TagSerializer(instance.tags.all(), many=True).data
-        return ret
+    def get_tags(self, obj):
+        return TagSerializer(obj.idea.tags.all(), many=True).data
 
     class Meta:
         model = Implementation

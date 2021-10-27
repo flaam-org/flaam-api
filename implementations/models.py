@@ -19,9 +19,6 @@ class Implementation(models.Model):
     draft = models.BooleanField(default=True)
     is_validated = models.BooleanField(default=False)
     is_accepted = models.BooleanField(default=False)
-    tags = models.ManyToManyField(
-        "tags.Tag", blank=True, related_name="implementation_tags"
-    )
     completed_milestones = ArrayField(
         models.CharField(max_length=10), size=20, default=list, blank=True
     )
