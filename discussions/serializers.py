@@ -51,6 +51,7 @@ class DiscussionSerializer(serializers.ModelSerializer):
         model = Discussion
         fields = (
             "id",
+            "idea",
             "title",
             "body",
             "owner",
