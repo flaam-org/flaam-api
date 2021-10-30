@@ -3,32 +3,13 @@ from rest_framework import serializers
 from .models import Discussion, DiscussionComment
 
 
-class DiscussionCommentSerializer(serializers.ModelSerializer):
-    owner_avatar = serializers.CharField(source="owner.avatar", read_only=True)
-    owner_username = serializers.CharField(source="owner.username", read_only=True)
-
-    class Meta:
-        model = DiscussionComment
-        fields = (
-            "id",
-            "discussion",
-            "body",
-            "owner",
-            "owner_avatar",
-            "owner_username",
-            "created_at",
-            "updated_at",
-        )
-
-
 class DiscussionSerializer(serializers.ModelSerializer):
-    owner_avatar = serializers.CharField(source="owner.avatar", read_only=True)
     owner_username = serializers.CharField(source="owner.username", read_only=True)
+    owner_avatar = serializers.CharField(source="owner.avatar", read_only=True)
     viewed = serializers.SerializerMethodField(read_only=True)
     view_count = serializers.IntegerField(read_only=True)
     vote = serializers.SerializerMethodField(read_only=True)
     upvote_count = serializers.IntegerField(read_only=True)
-    downvote_count = serializers.IntegerField(read_only=True)
     downvote_count = serializers.IntegerField(read_only=True)
     comments_count = serializers.IntegerField(read_only=True)
 
@@ -55,9 +36,10 @@ class DiscussionSerializer(serializers.ModelSerializer):
             "title",
             "body",
             "owner",
-            "owner_avatar",
             "owner_username",
+            "owner_avatar",
             "viewed",
+            "draft",
             "view_count",
             "vote",
             "upvote_count",
@@ -66,3 +48,23 @@ class DiscussionSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+        read_only_fields = ("owner",)
+
+
+class DiscussionCommentSerializer(serializers.ModelSerializer):
+    owner_avatar = serializers.CharField(source="owner.avatar", read_only=True)
+    owner_username = serializers.CharField(source="owner.username", read_only=True)
+
+    class Meta:
+        model = DiscussionComment
+        fields = (
+            "id",
+            "discussion",
+            "body",
+            "owner",
+            "owner_avatar",
+            "owner_username",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("owner",)

@@ -6,8 +6,8 @@ from .models import Implementation, ImplementationComment
 
 
 class ImplementationSerializer(serializers.ModelSerializer):
-    owner_avatar = serializers.CharField(source="owner.avatar", read_only=True)
     owner_username = serializers.CharField(source="owner.username", read_only=True)
+    owner_avatar = serializers.CharField(source="owner.avatar", read_only=True)
     bookmarked = serializers.SerializerMethodField(read_only=True)
     viewed = serializers.SerializerMethodField(read_only=True)
     view_count = serializers.IntegerField(read_only=True)
@@ -48,8 +48,8 @@ class ImplementationSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "owner",
-            "owner_avatar",
             "owner_username",
+            "owner_avatar",
             "idea",
             "title",
             "description",
@@ -70,6 +70,7 @@ class ImplementationSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+        read_only_fields = ("owner",)
 
 
 class ImplementationCommentSerializer(serializers.ModelSerializer):
@@ -88,3 +89,4 @@ class ImplementationCommentSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+        read_only_fields = ("owner",)
