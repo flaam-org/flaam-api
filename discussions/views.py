@@ -42,6 +42,7 @@ class DiscussionListView(ListCreateAPIView):
         )
     )
     ordering = ("-created_at",)
+    filterset_fields = ("idea", "owner", "draft")
     search_fields = ("title", "description", "idea__title")
     ordering_fields = (
         "upvote_count",
