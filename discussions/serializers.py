@@ -28,6 +28,11 @@ class DiscussionSerializer(serializers.ModelSerializer):
                 return -1
         return 0
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        print(data)
+        return data
+
     class Meta:
         model = Discussion
         fields = (
