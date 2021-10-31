@@ -14,7 +14,6 @@ class ImplementationSerializer(serializers.ModelSerializer):
     vote = serializers.SerializerMethodField(read_only=True)
     upvote_count = serializers.IntegerField(read_only=True)
     downvote_count = serializers.IntegerField(read_only=True)
-    downvote_count = serializers.IntegerField(read_only=True)
     comments_count = serializers.IntegerField(read_only=True)
     milestones = serializers.ListField(source="idea.milestones", read_only=True)
     tags = serializers.SerializerMethodField(read_only=True)

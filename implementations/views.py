@@ -36,9 +36,9 @@ class ImplementationListView(ListCreateAPIView):
             "comments",
         )
         .annotate(
-            upvotes_count=Count("upvotes"),
-            downvotes_count=Count("downvotes"),
-            views_count=Count("views"),
+            upvote_count=Count("upvotes"),
+            downvote_count=Count("downvotes"),
+            view_count=Count("views"),
             comments_count=Count("comments"),
         )
     )
@@ -99,9 +99,9 @@ class ImplementationDetailView(RetrieveUpdateDestroyAPIView):
             "comments",
         )
         .annotate(
-            upvotes_count=Count("upvotes"),
-            downvotes_count=Count("downvotes"),
-            views_count=Count("views"),
+            upvote_count=Count("upvotes"),
+            downvote_count=Count("downvotes"),
+            view_count=Count("views"),
             comments_count=Count("comments"),
         )
     )
