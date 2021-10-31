@@ -24,7 +24,7 @@ class DiscussionListView(ListCreateAPIView):
     List all discussions, or create a new discussion.
     """
 
-    serializers_class = DiscussionSerializer
+    serializer_class = DiscussionSerializer
     queryset = (
         Discussion.objects.all()
         .select_related("owner")
