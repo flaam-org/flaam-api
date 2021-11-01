@@ -52,6 +52,7 @@ class ImplementationSerializer(serializers.ModelSerializer):
             "idea",
             "title",
             "description",
+            "repo_url",
             "body",
             "tags",
             "milestones",
