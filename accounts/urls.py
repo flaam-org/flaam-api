@@ -20,7 +20,12 @@ urlpatterns = [
     # Users
     path("users", UserRegisterView.as_view(), name="signup"),
     path("user/profile", UserProfileView.as_view(), name="user_profile"),
-    path("user/<int:pk>", PublicUserProfileView.as_view(), name="user_public"),
+    path("user/<int:pk>", PublicUserProfileView.as_view(), name="user_public_id"),
+    path(
+        "user/<str:username>",
+        PublicUserProfileView.as_view(),
+        name="user_public_username",
+    ),
     path("user/exists", UserExistsView.as_view(), name="user_exists"),
     # password
     path(

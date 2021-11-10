@@ -185,9 +185,9 @@ class PublicUserProfileView(APIView):
             status.HTTP_404_NOT_FOUND: "Not found.",
         },
     )
-    def get(self, request: Request, pk: int) -> Response:
+    def get(self, request: Request, **kwargs) -> Response:
         """Read public user profile"""
-        user = get_object_or_404(UserModel, pk=pk)
+        user = get_object_or_404(UserModel, **kwargs)
         serializer = PublicUserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
