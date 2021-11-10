@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "debug_toolbar",
     "drf_yasg",
     "django_filters",
+    "django_admin_shell",
     # local
     "tags",
     "accounts",

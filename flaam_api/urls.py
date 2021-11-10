@@ -52,6 +52,7 @@ api_v1_urlpatterns = [
 
 urlpatterns = [
     path("api/v1/", include(api_v1_urlpatterns), name="api_v1"),
+    path("admin/shell/", include("django_admin_shell.urls")),
     path("admin/", admin.site.urls),
 ]
 

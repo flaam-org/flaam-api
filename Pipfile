@@ -16,6 +16,7 @@ drf-yasg = "==1.20.0"
 gunicorn = "==20.1.0"
 psycopg2 = "==2.9.1"
 sentry-sdk = "==1.4.3"
+django-admin-shell = "*"
 
 [dev-packages]
 ipython = "*"
