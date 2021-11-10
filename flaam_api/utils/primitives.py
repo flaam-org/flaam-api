@@ -13,6 +13,4 @@ def errors_to_string(errors: dict) -> str:
 
 
 def sha1sum(string: str) -> str:
-    sha_1 = hashlib.sha1()
-    sha_1.update(string.encode("utf-8"))
-    return sha_1.hexdigest()
+    return hashlib.sha1(string.encode("utf-8")).hexdigest()
