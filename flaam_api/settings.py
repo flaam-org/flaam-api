@@ -148,6 +148,34 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Custom Settings
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": (
+                "%(asctime)s [%(process)d] [%(levelname)s] "
+                "%(pathname)s:%(lineno)s %(funcName)s: "
+                "%(message)s"
+            )
+        }
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": True,
+        },
+    },
+}
+
 AUTH_USER_MODEL = "accounts.User"
 
 AUTHENTICATION_BACKENDS = ("accounts.auth.EmailOrUsernameModelBackend",)
