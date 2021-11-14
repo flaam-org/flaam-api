@@ -14,12 +14,24 @@ class IdeaFilterSet(django_filters.FilterSet):
         distinct=True,
     )
 
+    owner_u = django_filters.CharFilter(
+        field_name="owner__username",
+        lookup_expr="iexact",
+    )
+
+    bookmarked_by_u = django_filters.CharFilter(
+        field_name="bookmarked_by__username",
+        lookup_expr="iexact",
+    )
+
     class Meta:
         model = Idea
         fields = (
-            "owner",
             "tags",
+            "owner",
+            "owner_u",
             "bookmarked_by",
+            "bookmarked_by_u",
             "draft",
             "archived",
         )

@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 
 from flaam_api.utils.permissions import IsOwnerOrReadOnly
 
+from .filters import DiscussionCommentFilterSet, DiscussionFilterSet
 from .models import Discussion, DiscussionComment
 from .serializers import DiscussionCommentSerializer, DiscussionSerializer
 
@@ -42,7 +43,8 @@ class DiscussionListView(ListCreateAPIView):
         )
     )
     ordering = ("-created_at",)
-    filterset_fields = ("idea", "owner", "draft")
+    filterset_class = DiscussionFilterSet
+
     search_fields = ("title", "description", "idea__title")
     ordering_fields = (
         "upvote_count",
@@ -164,7 +166,7 @@ class DiscussionCommentListView(ListCreateAPIView):
     serializer_class = DiscussionCommentSerializer
     queryset = DiscussionComment.objects.all().select_related("owner")
     ordering = ("-created_at",)
-    filterset_fields = ("discussion", "owner")
+    filterset_class = DiscussionCommentFilterSet
     search_fields = ("body",)
     ordering_fields = ("created_at", "updated_at")
 

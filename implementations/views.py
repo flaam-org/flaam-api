@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 
 from flaam_api.utils.permissions import IsOwnerOrReadOnly
 
-from .filters import ImplementationFilterSet
+from .filters import ImplementationCommentFilterSet, ImplementationFilterSet
 from .models import Implementation, ImplementationComment
 from .serializers import ImplementationCommentSerializer, ImplementationSerializer
 
@@ -164,7 +164,7 @@ class ImplementationCommentListView(ListCreateAPIView):
     serializer_class = ImplementationCommentSerializer
     queryset = ImplementationComment.objects.select_related("owner").all()
     ordering = ("-created_at",)
-    filterset_fields = ("implementation", "owner")
+    filterset_class = ImplementationCommentFilterSet
     search_fields = ("body",)
     ordering_fields = ("created_at", "updated_at")
 
