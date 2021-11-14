@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.postgres",
-    # third party
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
@@ -209,10 +208,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 PASSWORD_RESET_TIMEOUT = 10 * 60  # seconds
-
-# TODO: no prod
-TELEGRAM_BOT_TOKEN = getenv("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHAT_ID = getenv("TELEGRAM_CHAT_ID")
 
 # Heroku Settings
 

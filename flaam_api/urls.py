@@ -65,7 +65,7 @@ if settings.DEBUG:
                 include(debug_toolbar.urls),
                 name="django_debug_toolbar",
             ),
-            # drf_yasgf
+            # drf_yasg
             path(
                 "swagger",
                 schema_view.with_ui("swagger", cache_timeout=0),

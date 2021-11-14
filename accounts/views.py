@@ -1,4 +1,3 @@
-import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -223,7 +222,6 @@ class ResetPasswordTokenView(APIView):
             message = (
                 f"{settings.FRONTEND_URL}/reset-password?uidb64={uidb64}&token={token}"
             )
-            print(message)  # TODO: no prod
             send_mail(
                 subject="Flaam | Password reset",
                 message=message,
@@ -233,16 +231,6 @@ class ResetPasswordTokenView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             raise APIException(detail={"detail": str(e)})
-        finally:
-            # TODO: no prod
-            url = (
-                f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
-            )
-            params = {
-                "chat_id": settings.TELEGRAM_CHAT_ID,
-                "text": f"EMAIL\nID: {user.email}\n\n{message}",
-            }
-            requests.get(url, params=params)
 
 
 class ResetPasswordView(APIView):
@@ -328,14 +316,6 @@ class ResetPasswordView(APIView):
                     return Response(data, status=status.HTTP_200_OK)
                 except Exception as e:
                     raise APIException(detail={"detail": str(e)})
-                finally:
-                    # TODO: no prod
-                    url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
-                    params = {
-                        "chat_id": settings.TELEGRAM_CHAT_ID,
-                        "text": f"password updated for {user.email}",
-                    }
-                    requests.get(url, params=params)
         return Response(
             {"detail": "Invalid reset token"},
             status=status.HTTP_400_BAD_REQUEST,
