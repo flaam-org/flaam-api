@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = getenv("SECRET_KEY", "insecure")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = getenv("DEBUG", "false").lower() == "true"
 
 ALLOWED_HOSTS = []
 
@@ -181,18 +181,19 @@ AUTH_USER_MODEL = "accounts.User"
 AUTHENTICATION_BACKENDS = ("accounts.auth.EmailOrUsernameModelBackend",)
 
 REST_FRAMEWORK = {
-    "EXCEPTION_HANDLER": "flaam_api.utils.exceptions.exception_handler",
+    "DEFAULT_PARSER_CLASSES": ("rest_framework.parsers.JSONParser",),
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
     ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PAGINATION_CLASS": "flaam_api.utils.paginations.CustomLimitOffsetPagination",
     "DEFAULT_FILTER_BACKENDS": (
         "django_filters.rest_framework.DjangoFilterBackend",
         "rest_framework.filters.SearchFilter",
         "rest_framework.filters.OrderingFilter",
     ),
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
-    "DEFAULT_PAGINATION_CLASS": "flaam_api.utils.paginations.CustomLimitOffsetPagination",
+    "EXCEPTION_HANDLER": "flaam_api.utils.exceptions.exception_handler",
 }
 
 # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
@@ -236,6 +237,26 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 PASSWORD_RESET_TIMEOUT = 10 * 60  # seconds
+
+if DEBUG:
+    REST_FRAMEWORK.update(
+        {
+            "DEFAULT_AUTHENTICATION_CLASSES": (
+                "rest_framework_simplejwt.authentication.JWTAuthentication",
+                "rest_framework.authentication.SessionAuthentication",
+            ),
+            "DEFAULT_RENDERER_CLASSES": (
+                "rest_framework.renderers.JSONRenderer",
+                "rest_framework.renderers.BrowsableAPIRenderer",
+            ),
+            "DEFAULT_PARSER_CLASSES": (
+                "rest_framework.parsers.JSONParser",
+                "rest_framework.parsers.FormParser",
+                "rest_framework.parsers.MultiPartParser",
+            ),
+        }
+    )
+
 
 # Heroku Settings
 
