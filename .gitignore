@@ -11,3 +11,4 @@ db.sqlite3-journal
 media
 .envrc
 db_dump_*.json
+staticfiles

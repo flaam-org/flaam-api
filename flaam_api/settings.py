@@ -27,7 +27,7 @@ SECRET_KEY = getenv("SECRET_KEY", "insecure")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv("DEBUG", "false").lower() == "true"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -58,6 +58,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -141,6 +142,11 @@ USE_TZ = True
 
 STATIC_URL = "/static/"
 
+STATICFILES_DIRS = (BASE_DIR / "static",)
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
