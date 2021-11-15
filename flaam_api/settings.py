@@ -191,6 +191,7 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "flaam_api.utils.paginations.CustomLimitOffsetPagination",
@@ -247,10 +248,6 @@ PASSWORD_RESET_TIMEOUT = 10 * 60  # seconds
 if DEBUG:
     REST_FRAMEWORK.update(
         {
-            "DEFAULT_AUTHENTICATION_CLASSES": (
-                "rest_framework_simplejwt.authentication.JWTAuthentication",
-                "rest_framework.authentication.SessionAuthentication",
-            ),
             "DEFAULT_RENDERER_CLASSES": (
                 "rest_framework.renderers.JSONRenderer",
                 "rest_framework.renderers.BrowsableAPIRenderer",
