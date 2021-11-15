@@ -53,7 +53,19 @@ api_v1_urlpatterns = [
 urlpatterns = [
     path("api/v1/", include(api_v1_urlpatterns), name="api_v1"),
     path("admin/", admin.site.urls),
+    # drf_yasg
+    path(
+        "swagger",
+        schema_view.with_ui("swagger", cache_timeout=0),
+        name="schema-swagger-ui",
+    ),
+    path(
+        "redoc",
+        schema_view.with_ui("redoc", cache_timeout=0),
+        name="schema-redoc",
+    ),
 ]
+
 
 if settings.DEBUG:
     urlpatterns.extend(
@@ -64,17 +76,6 @@ if settings.DEBUG:
                 "__debug__/",
                 include(debug_toolbar.urls),
                 name="django_debug_toolbar",
-            ),
-            # drf_yasg
-            path(
-                "swagger",
-                schema_view.with_ui("swagger", cache_timeout=0),
-                name="schema-swagger-ui",
-            ),
-            path(
-                "redoc",
-                schema_view.with_ui("redoc", cache_timeout=0),
-                name="schema-redoc",
             ),
         ]
     )
