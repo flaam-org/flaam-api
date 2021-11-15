@@ -38,9 +38,20 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         favourite_tags = validated_data.pop("favourite_tags", None)
+        following = validated_data.pop("following", None)
+        bookmarked_ideas = validated_data.pop("bookmarked_ideas", None)
+        bookmarked_implementations = validated_data.pop(
+            "bookmarked_implementations", None
+        )
         user = UserModel.objects.create_user(**validated_data)
-        if favourite_tags:
+        if favourite_tags is not None:
             user.favourite_tags.set(favourite_tags)
+        if following is not None:
+            user.following.set(following)
+        if bookmarked_ideas is not None:
+            user.bookmarked_ideas.set(bookmarked_ideas)
+        if bookmarked_implementations is not None:
+            user.bookmarked_implementations.set(bookmarked_implementations)
         return user
 
     def update(self, instance, validated_data):
