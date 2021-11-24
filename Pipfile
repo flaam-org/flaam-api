@@ -21,7 +21,7 @@ whitenoise = "*"
 [dev-packages]
 ipython = "*"
 pre-commit = "*"
-black = "==21.9b0"
+black = "==21.11b1"
 isort = "*"
 
 [requires]
