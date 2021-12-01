@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from djangoql.admin import DjangoQLSearchMixin
+from rest_framework_simplejwt import token_blacklist
 
 from .models import User
 
@@ -83,4 +84,12 @@ class UserAdmin(DjangoQLSearchMixin, BaseUserAdmin):
     )
 
 
+class OutstandingTokenAdmin(token_blacklist.admin.OutstandingTokenAdmin):
+    # https://github.com/jazzband/djangorestframework-simplejwt/issues/266#issuecomment-820745103
+    def has_delete_permission(self, *args, **kwargs):
+        return True
+
+
+admin.site.unregister(token_blacklist.models.OutstandingToken)
+admin.site.register(token_blacklist.models.OutstandingToken, OutstandingTokenAdmin)
 admin.site.register(User, UserAdmin)
