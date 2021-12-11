@@ -15,13 +15,13 @@ repos:
         types: ["python"]
         pass_filenames: false
   - repo: https://github.com/PyCQA/isort
-    rev: 5.9.3
+    rev: 5.10.1
     hooks:
       - id: isort
         name: Sort imports
         args: [--profile=black]
   - repo: https://github.com/psf/black
-    rev: 21.9b0
+    rev: 21.12b0
     hooks:
       - id: black
         name: Format files
