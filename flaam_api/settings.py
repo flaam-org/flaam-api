@@ -56,10 +56,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -146,7 +146,7 @@ STATICFILES_DIRS = (BASE_DIR / "static",)
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -267,11 +267,12 @@ if DEBUG:
 # Heroku Settings
 
 if getenv("HEROKU_ENVIRONMENT"):
-    import django_heroku
+
+    import dj_database_url
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
 
-    django_heroku.settings(locals())
+    DATABASES["default"] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
     sentry_sdk.init(
         dsn=getenv("SENTRY_DSN"),
