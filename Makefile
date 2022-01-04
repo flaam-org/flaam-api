@@ -1,7 +1,6 @@
 .PHONY: test
 .DEFAULT_GOAL := help
 
-SHELL := /bin/bash
 PROJECT_NAME := flaam_api
 SETTINGS := $(PROJECT_NAME).settings
 
@@ -9,15 +8,8 @@ help: ## Display callable targets.
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | \
 	awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-check-pipenv:
-	@pipenv --version || { echo "pipenv not found"; exit 1; }
-
-check-pre-commit:
-	@pre-commit --version || { echo "pre-commit not found"; exit 1; }
-
-check-direnv:
-	@which direnv > /dev/null || \
-	{ echo "check this out https://direnv.net/#basic-installation"; exit 1; }
+require-%:
+	@command -v $(@:require-%=%) > /dev/null || { echo "$(@:require-%=%) not found in path"; exit 1; }
 
 update: ## Install and update dependencies.
 	@echo "--> Updating dependencies"
@@ -29,11 +21,12 @@ clean: ## Clean up.
 	@echo "--> Cleaning pycache files"
 	@find . -type f -name '*.py[co]' -delete -o -type d -name __pycache__ -delete
 
-init: check-pipenv check-pre-commit check-direnv ## Setup Dev environment.
+init: require-pipenv require-pre-commit require-direnv ## Setup Dev environment.
 	@echo "--> Initializing"
 	@pipenv install
 	@echo "--> Copying .envrc"
 	@yes n | cp -vipr sample.envrc .envrc
+	@${EDITOR} .envrc
 	@direnv allow
 
 migrations: ## Create migrations.
@@ -63,7 +56,7 @@ loaddata: ## Load data from most recent db dump
 
 init-db: ## Create database.
 	@echo "--> Creating database"
-	@make migrations migrate loaddata
+	@${MAKE} migrations migrate loaddata
 
 reinit-db: clean-db init-db ## Re-initialize database.
 
@@ -73,22 +66,22 @@ su: ## Create superuser.
 	@echo "--> Creating superuser"
 	@pipenv run ./manage.py createsuperuser
 
-run: ## Runserver.
+r run: ## Runserver.
 	@pipenv run ./manage.py runserver
 
-ngrok: ## Run ngrok.
+ngrok: require-ngrok require-jq ## Run debugserver and ngrok.
 	@echo "--> Starting server"
 	@pipenv run ./manage.py runserver --noreload 0.0.0.0:8001 > /dev/null 2>&1 &
 	@echo "--> Starting ngrok"
 	@ngrok http 8001 --region=in --log=stdout > /dev/null 2>&1 &
+	@sleep 2
 	@curl -s http://127.0.0.1:4040/api/tunnels | jq '.tunnels[0].public_url' -r
 
-kill-ngrok: ## Kill ngrok.
-	#kill runserver
+kill-ngrok: ## Kill debugserver and ngrok.
 	@echo "--> Killing server"
-	@kill $(shell ps aux | grep 'runserver.*8001' | grep -v grep | awk '{print $2}')
+	@kill -15 $(shell ps a | awk '/[r]unserver.*8001/{print $$1}') > /dev/null 2>&1 || { echo "server not running";}
 	@echo "--> Killing ngrok"
-	@kill -9 $(shell ps aux | grep ngrok | grep -v grep | awk '{print $2}')
+	@kill -15 $(shell ps a | awk '/[n]grok.*8001/{print $$1}') > /dev/null 2>&1 || { echo "ngrok not running";}
 	@echo "RIP"
 
 shell: ## Start django interactive shell.
