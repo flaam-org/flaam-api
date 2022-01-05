@@ -1,6 +1,7 @@
 # Flaam-Api
 
 [![Deployment](https://github.com/flaam-org/flaam-api/actions/workflows/main.yml/badge.svg?branch=main&event=deployment)](https://github.com/flaam-org/flaam-api/actions/workflows/main.yml)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fflaam-org%2Fflaam-api.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fflaam-org%2Fflaam-api?ref=badge_shield)
 
 This is the REST api for [Flaam](https://github.com/flaam-org/about). The live version of this api is available at [https://flaam-api.herokuapp.com/api/v1/](https://flaam-api.herokuapp.com/api/v1/).
 
@@ -57,3 +58,7 @@ make init run
 ### Model Graph
 
 ![Model Graph](model_graph.png)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fflaam-org%2Fflaam-api.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fflaam-org%2Fflaam-api?ref=badge_large)
