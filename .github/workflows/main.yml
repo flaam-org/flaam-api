@@ -1,52 +1,53 @@
-name: CI
+name: Deployment
 
-on: push
+concurrency:
+  group: production
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   test:
-    name: Test
+    environment: production
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
         with:
-          fetch-depth: 0
+          python-version: "3.10"
 
-      - name: Get commit details
-        id: commit_info
+      - id: cache-pipenv
+        uses: actions/cache@v2
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Install pipenv
         run: |
-          echo ::set-output name=commit_count::$(git rev-list --count ${{ github.event.before }}..${{ github.event.after }} || echo 0)
-          COMMIT_LOG=$(git log --pretty=format:" - %s" --abbrev-commit ${{ github.event.before }}..${{ github.event.after }} || echo null)
-          COMMIT_LOG="${COMMIT_LOG//'%'/'%25'}"
-          COMMIT_LOG="${COMMIT_LOG//$'\n'/'%0A'}"
-          COMMIT_LOG="${COMMIT_LOG//$'\r'/'%0D'}"
-          echo ::set-output name=commit_log::$COMMIT_LOG
+          python -m pip install --upgrade pipenv wheel
 
-      - name: Send a message about the latest commit
+      - name: Install dependencies
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
         run: |
-          curl \
-          -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
-          -d disable_notification=true \
-          -d parse_mode=HTML \
-          --data-urlencode "text=\
-          ↗️ <b>PUSH</b>
-          <b>was made at:</b> ${{ github.repository }}
-          <b>by:</b> <u>${{ github.actor }}</u>
-          <b>commits pushed:</b> ${{ steps.commit_info.outputs.commit_count }}
-          <b>commit log:</b>
-          <pre>${{ steps.commit_info.outputs.commit_log }}</pre>
+          pipenv install
 
-          <b>url:</b> https://github.com/${{ github.repository }}/commit/${{ github.sha }}" \
-          https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage
+      # - name: Run tests
+      #   run: |
+      #     make test
 
-  deploy:
-    name: Deploy
+  deployment:
+    environment: production
     runs-on: ubuntu-latest
     needs: [test]
-    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v2
 
-      - uses: akhileshns/heroku-deploy@v3.12.12
+      - name: Deploy
+        uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_email: ${{secrets.HEROKU_ACCOUNT_EMAIL}}
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
