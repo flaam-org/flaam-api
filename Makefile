@@ -1,4 +1,4 @@
-.PHONY: test
+.PHONY: test static
 .DEFAULT_GOAL := help
 
 PROJECT_NAME := flaam_api
@@ -28,6 +28,8 @@ init: require-pipenv require-pre-commit require-direnv ## Setup Dev environment.
 	@yes n | cp -vipr sample.envrc .envrc
 	@${EDITOR} .envrc
 	@direnv allow
+	@@echo "--> Creating database"
+	@${MAKE} migrations migrate
 
 migrations: ## Create migrations.
 	@echo "--> Creating migrations"
@@ -41,7 +43,7 @@ migrate: ## Migrate database.
 	@echo "--> Migrating database"
 	@pipenv run ./manage.py migrate
 
-dump: ## Dump database.
+dump dumpdata: ## Dump database.
 	@echo "--> Dumping database"
 	@pipenv run ./manage.py dumpdata tags accounts ideas implementations discussions > db_dump_$(shell date +%FT%T.%3N%Z).json
 
@@ -101,3 +103,7 @@ lint: ## Lint code.
 deploy: ## Deploy to production.
 	@git push heroku main
 	@echo "Now look for bugs!"
+
+static: ## Collect static files.
+	@echo "--> Collecting static files"
+	@pipenv run ./manage.py collectstatic --noinput
