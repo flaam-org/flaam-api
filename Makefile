@@ -13,7 +13,7 @@ require-%:
 
 update: ## Install and update dependencies.
 	@echo "--> Updating dependencies"
-	@pipenv update
+	@pipenv update --dev
 
 clean: ## Clean up.
 	@echo "--> Removing venv"
@@ -23,11 +23,10 @@ clean: ## Clean up.
 
 init: require-pipenv require-pre-commit require-direnv ## Setup Dev environment.
 	@echo "--> Initializing"
-	@pipenv install
+	@pipenv install --dev
 	@echo "--> Copying .envrc"
 	@yes n | cp -vipr sample.envrc .envrc
-	@${EDITOR} .envrc
-	@direnv allow
+	@direnv edit
 	@@echo "--> Creating database"
 	@${MAKE} migrations migrate
 

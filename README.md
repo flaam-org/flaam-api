@@ -34,7 +34,6 @@ To view the api documentation, visit [https://flaam-api.herokuapp.com/swagger](h
 #### Requirements
 
 - [direnv](https://direnv.net/)
-- [pre-commit](https://pre-commit.com/)
 - [make](https://www.gnu.org/software/make/)
 
 #### Usage
